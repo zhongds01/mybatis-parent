@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zds.mapper.TeacherMapper">
+    <resultMap id="teacherMap" type="com.zds.pojo.Teacher">
+        <id property="id" column="t_id"/>
+        <result property="tName" column="t_name"/>
+    </resultMap>
+    <resultMap id="teacherWithStudentMap" type="com.zds.pojo.TeacherAndStudent" extends="teacherMap">
+        <collection property="studentList" ofType="com.zds.pojo.Student">
+            <id column="s_id" property="id"/>
+            <result property="sName" column="s_name"/>
+            <result property="sBirthday" column="s_birthday"/>
+            <result property="sSex" column="s_sex"/>
+        </collection>
+    </resultMap>
+    <select id="getTeacherWithStudentByStuId" parameterType="long" resultMap="teacherWithStudentMap">
+        select t.id t_id, t.t_name, stu.id s_id, stu.s_name, stu.s_birthday, stu.s_sex
+        from teacher t,
+             student stu,
+             score sc,
+             course c
+        where sc.s_id = stu.id
+          and sc.c_id = c.id
+          and c.t_id = t.id
+          and stu.id = #{id}
+    </select>
+
+    <select id="getTeacherWithStudent" resultMap="teacherWithStudentMap">
+        select t.id t_id, t.t_name, stu.id s_id, stu.s_name, stu.s_birthday, stu.s_sex
+        from teacher t,
+             student stu,
+             score sc,
+             course c
+        where sc.s_id = stu.id
+          and sc.c_id = c.id
+          and c.t_id = t.id
+    </select>
+</mapper>
