@@ -11,6 +11,7 @@
     <modules>
         <module>mybatis-base</module>
         <module>mybatis-cache</module>
+        <module>mybatis-spring</module>
     </modules>
 
     <properties>
