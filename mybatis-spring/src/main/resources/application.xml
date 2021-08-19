@@ -9,26 +9,39 @@
     <!-- 引入外部资源文件 -->
     <context:property-placeholder location="classpath:jdbc.properties"/>
     <!-- dbcp2数据源连接池配置 -->
-    <!--<bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource">
+    <bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource">
         <property name="driverClassName" value="${jdbc.driver}"/>
         <property name="url" value="${jdbc.url}"/>
         <property name="username" value="${jdbc.username}"/>
         <property name="password" value="${jdbc.password}"/>
-    </bean>-->
+    </bean>
     <!-- c3p0数据源连接池配置 -->
-    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+    <!--<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
         <property name="driverClass" value="${jdbc.driver}"/>
         <property name="jdbcUrl" value="${jdbc.url}"/>
         <property name="user" value="${jdbc.username}"/>
         <property name="password" value="${jdbc.password}"/>
-    </bean>
+    </bean>-->
 
     <!-- SqlSession -->
     <bean id="sqlSession" class="org.mybatis.spring.SqlSessionFactoryBean">
         <!-- 指定mybatis配置文件路径，也可以不使用配置文件的形式，直接使用configuration属性配置，只能二选一 -->
-        <property name="configLocation" value="classpath:mybatis-config.xml"/>
+        <!--<property name="configLocation" value="classpath:mybatis-config.xml"/>-->
         <!-- 指定数据源 -->
         <property name="dataSource" ref="dataSource"/>
+        <!-- 指定mapper扫描路径 -->
+        <property name="mapperLocations" value="classpath:com/zds/mapper/*.xml"/>
+        <!-- 指定设置javaBean的别名包路径 -->
+        <property name="typeAliasesPackage" value="com.zds.pojo"/>
+        <!-- 其他设置 -->
+        <property name="configuration">
+            <bean class="org.apache.ibatis.session.Configuration">
+                <!-- 指定日志类 -->
+                <property name="logImpl" value="org.apache.ibatis.logging.stdout.StdOutImpl"/>
+                <!-- 开始驼峰式命名自动转换 -->
+                <property name="mapUnderscoreToCamelCase" value="true"/>
+            </bean>
+        </property>
     </bean>
 
     <!-- 配置Mapper接口扫描，自动将代理mapper注入spring容器中 -->
