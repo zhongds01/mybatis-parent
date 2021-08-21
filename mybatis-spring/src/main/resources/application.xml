@@ -8,6 +8,7 @@
                            http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
     <!-- 引入外部资源文件 -->
     <context:property-placeholder location="classpath:jdbc.properties"/>
+    <context:component-scan base-package="com.zds.service.impl"/>
     <!-- dbcp2数据源连接池配置 -->
     <bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource">
         <property name="driverClassName" value="${jdbc.driver}"/>
@@ -52,12 +53,13 @@
     </bean>
 
     <!-- 配置事务管理 -->
-<!--    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
         <property name="dataSource" ref="dataSource"/>
-    </bean>-->
+    </bean>
 
-    <!-- 开启事务注解 -->
-<!--
+    <!-- 开启事务注解，再service层方法上加上@Transactional实现 -->
     <tx:annotation-driven transaction-manager="transactionManager"/>
--->
+
+
+
 </beans>

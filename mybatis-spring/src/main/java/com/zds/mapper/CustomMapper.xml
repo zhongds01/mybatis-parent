@@ -19,4 +19,16 @@
         values (#{custom.id}, #{custom.customName}, #{custom.customPwd}, #{custom.customSex}, #{custom.customTel},
                 #{custom.customEmail}, #{custom.customAddress}, null, null, #{custom.status})
     </insert>
+
+    <update id="updateCustomById">
+        update custom c
+        set c.custom_name = #{custom.customName},
+            c.custom_pwd  = #{custom.customPwd}
+        where c.custom_id = #{custom.id}
+    </update>
+
+    <select id="selectCustom" resultType="custom">
+        select *
+        from custom
+    </select>
 </mapper>
