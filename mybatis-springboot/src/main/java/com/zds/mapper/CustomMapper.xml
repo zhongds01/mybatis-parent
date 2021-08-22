@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zds.mapper.CustomMapper">
+    <!-- 如果使用二级缓存，需要配置以下标签开启 -->
+    <cache/>
+    <resultMap id="customMap" type="com.zds.pojo.Custom">
+        <id column="custom_id" property="id"/>
+    </resultMap>
+    <!-- 如果想禁用某条查询的缓存，在查询标签中使用useCache="false"配置 -->
+    <select id="selectOneCustomById" parameterType="long" resultMap="customMap" useCache="false">
+        select *
+        from custom
+        where custom_id = #{id}
+    </select>
+
+    <insert id="insertCustom">
+        insert into custom
+        values (#{custom.id}, #{custom.customName}, #{custom.customPwd}, #{custom.customSex}, #{custom.customTel},
+                #{custom.customEmail}, #{custom.customAddress}, null, null, #{custom.status})
+    </insert>
+
+    <update id="updateCustomById">
+        update custom c
+        set c.custom_name = #{custom.customName},
+            c.custom_pwd  = #{custom.customPwd}
+        where c.custom_id = #{custom.id}
+    </update>
+
+    <select id="selectCustom" resultType="custom">
+        select *
+        from custom
+    </select>
+</mapper>
