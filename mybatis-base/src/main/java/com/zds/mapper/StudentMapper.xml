@@ -21,10 +21,12 @@
     <delete id="batchDeleteStudentByIds">
         delete from student
         <where>
-            id in
-            <foreach collection="ids" item="id" open="(" close=")" separator=",">
-                #{id}
-            </foreach>
+            <if test="ids != null and ids.size() > 0">
+                id in
+                <foreach collection="ids" item="id" open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
         </where>
     </delete>
 
@@ -41,6 +43,20 @@
                 , s_sex = #{sSex}
             </if>
         </set>
+        where id = #{id}
+    </update>
+
+    <update id="updateStudent" parameterType="student">
+        update student
+        set
+        <choose>
+            <when test="sName != null">
+                s_name = #{sName}
+            </when>
+            <otherwise>
+                s_name = 1
+            </otherwise>
+        </choose>
         where id = #{id}
     </update>
 
