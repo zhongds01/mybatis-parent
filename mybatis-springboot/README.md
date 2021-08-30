@@ -71,5 +71,5 @@ mybatis.configuration.log-impl=org.apache.ibatis.logging.stdout.StdOutImpl
 
 2、springboot默认使用的数据源连接池为HikariDataSource
 
-3、自动输入时，需要使用接口声明实例，而不是实现类。
+3、自动注入时，需要使用接口声明实例，而不是实现类。
 
