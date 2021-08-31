@@ -1,7 +1,6 @@
 package com.zds.base;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -32,5 +31,7 @@ public class BaseEntity {
     )
     private Date updateTime;
 
+    @TableField(fill = FieldFill.INSERT)
+    @TableLogic()
     private Integer isDeleted;
 }

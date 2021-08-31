@@ -12,11 +12,12 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Custom extends BaseEntity implements Serializable {
+public class Customer extends BaseEntity implements Serializable {
     private static final long serialVersionUID = 9157528864358633663L;
-    private String customName;
-    private String customPwd;
-    private String customSex;
-    private String customTel;
-    private String customEmail;
+    private String customerName;
+    private String customerPassword;
+    private String customerSex;
+    private String customerTel;
+    private String customerEmail;
+    private String customerAddress;
 }
