@@ -92,13 +92,13 @@
   > 剩下的id、result表示javaBean属性名与数据库表列名的映射关系。（id特指主键）
 
   ```xml
-  <resultMap id="scoreMap" type="com.zds.pojo.Score">
+  <resultMap id="scoreMap" type="com.zds.entity.Score">
       <result property="sId" column="s_id"/>
       <result property="tId" column="t_id"/>
       <result property="score" column="score"/>
   </resultMap>
-  <resultMap id="scoreAndStudent" type="com.zds.pojo.ScoreAndStudent" extends="scoreMap">
-      <association property="student" javaType="com.zds.pojo.Student">
+  <resultMap id="scoreAndStudent" type="com.zds.entity.ScoreAndStudent" extends="scoreMap">
+      <association property="student" javaType="com.zds.entity.Student">
           <id property="id" column="id"/>
           <result property="sName" column="s_name"/>
           <result property="sBirthday" column="s_birthday"/>
@@ -106,12 +106,12 @@
       </association>
   </resultMap>
   
-  <resultMap id="teacherMap" type="com.zds.pojo.Teacher">
+  <resultMap id="teacherMap" type="com.zds.entity.Teacher">
       <id property="id" column="t_id"/>
       <result property="tName" column="t_name"/>
   </resultMap>
-  <resultMap id="teacherWithStudentMap" type="com.zds.pojo.TeacherAndStudent" extends="teacherMap">
-      <collection property="studentList" ofType="com.zds.pojo.Student">
+  <resultMap id="teacherWithStudentMap" type="com.zds.entity.TeacherAndStudent" extends="teacherMap">
+      <collection property="studentList" ofType="com.zds.entity.Student">
           <id column="s_id" property="id"/>
           <result property="sName" column="s_name"/>
           <result property="sBirthday" column="s_birthday"/>
@@ -355,7 +355,7 @@ public class ScoreAndStudent extends Score {
 }
 
 // mapper接口定义
-import com.zds.pojo.ScoreAndStudent;
+import com.zds.entity.ScoreAndStudent;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -374,13 +374,13 @@ mapper文件定义
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.zds.mapper.ScoreMapper">
-    <resultMap id="scoreMap" type="com.zds.pojo.Score">
+    <resultMap id="scoreMap" type="com.zds.entity.Score">
         <result property="sId" column="s_id"/>
         <result property="tId" column="t_id"/>
         <result property="score" column="score"/>
     </resultMap>
-    <resultMap id="scoreAndStudent" type="com.zds.pojo.ScoreAndStudent" extends="scoreMap">
-        <association property="student" javaType="com.zds.pojo.Student">
+    <resultMap id="scoreAndStudent" type="com.zds.entity.ScoreAndStudent" extends="scoreMap">
+        <association property="student" javaType="com.zds.entity.Student">
             <id property="id" column="id"/>
             <result property="sName" column="s_name"/>
             <result property="sBirthday" column="s_birthday"/>
@@ -402,7 +402,7 @@ mapper文件定义
 
 ```java
 import com.zds.mapper.ScoreMapper;
-import com.zds.pojo.ScoreAndStudent;
+import com.zds.entity.ScoreAndStudent;
 import com.zds.util.SqlSessionUtil;
 import org.apache.ibatis.session.SqlSession;
 import org.junit.Test;

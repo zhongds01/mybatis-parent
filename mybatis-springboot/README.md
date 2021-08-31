@@ -52,7 +52,7 @@ spring.datasource.password=123456
 ## 指定mapper文件的路径
 mybatis.mapper-locations=com/zds/mapper/*.xml
 ## 指定别名包的路径
-mybatis.type-aliases-package=com.zds.pojo
+mybatis.type-aliases-package=com.zds.entity
 ## 其他配置
 mybatis.configuration.map-underscore-to-camel-case=true
 mybatis.configuration.log-impl=org.apache.ibatis.logging.stdout.StdOutImpl

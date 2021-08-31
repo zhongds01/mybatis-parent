@@ -1,6 +1,6 @@
 package com.zds.service;
 
-import com.zds.pojo.Custom;
+import com.zds.entity.Custom;
 
 import java.util.List;
 

@@ -1,8 +1,7 @@
 package com.zds;
 
 import com.zds.mapper.TeacherMapper;
-import com.zds.pojo.Teacher;
-import com.zds.pojo.TeacherAndStudent;
+import com.zds.entity.TeacherAndStudent;
 import com.zds.util.SqlSessionUtil;
 import org.apache.ibatis.session.SqlSession;
 import org.junit.Test;

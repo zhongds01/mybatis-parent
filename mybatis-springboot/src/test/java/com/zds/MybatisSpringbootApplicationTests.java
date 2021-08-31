@@ -1,6 +1,6 @@
 package com.zds;
 
-import com.zds.pojo.Custom;
+import com.zds.entity.Custom;
 import com.zds.service.CustomService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

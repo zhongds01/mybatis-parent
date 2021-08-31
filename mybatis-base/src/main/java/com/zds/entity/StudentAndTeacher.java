@@ -1,14 +1,14 @@
-package com.zds.pojo;
+package com.zds.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Score {
-    private Long sId;
-    private Long cId;
-    private String score;
+public class StudentAndTeacher extends Student{
+    private List<Teacher> teacherList;
 }

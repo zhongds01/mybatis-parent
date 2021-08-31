@@ -1,7 +1,6 @@
 package com.zds.mapper;
 
-import com.zds.pojo.Custom;
-import org.apache.ibatis.annotations.Mapper;
+import com.zds.entity.Custom;
 import org.apache.ibatis.annotations.Param;
 import org.mybatis.spring.annotation.MapperScan;
 

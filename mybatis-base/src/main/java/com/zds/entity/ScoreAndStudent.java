@@ -1,11 +1,8 @@
-package com.zds.pojo;
+package com.zds.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
-
-import java.util.List;
 
 /**
  * 学生和成绩类
@@ -13,13 +10,13 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class StudentAndScore extends Student {
-    private List<Score> scoreList;
+public class ScoreAndStudent extends Score {
+    private Student student;
 
     @Override
     public String toString() {
-        return "StudentAndScore{" +
-                "scoreList=" + scoreList +
+        return "ScoreAndStudent{" +
+                "student=" + student +
                 "} " + super.toString();
     }
 }

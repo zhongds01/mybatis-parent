@@ -54,7 +54,7 @@ mapper.xml
 <mapper namespace="com.zds.mapper.CustomMapper">
     <!-- 如果使用二级缓存，需要配置以下标签开启 -->
     <cache/>
-    <resultMap id="customMap" type="com.zds.pojo.Custom">
+    <resultMap id="customMap" type="com.zds.entity.Custom">
         <id column="custom_id" property="id"/>
     </resultMap>
     <!-- 如果想禁用某条查询的缓存，在查询标签中使用useCache="false"配置 -->
@@ -124,7 +124,7 @@ public void testLevel2Cache() {
     </settings>
     <!-- 别名定义 -->
     <typeAliases>
-        <package name="com.zds.pojo"/>
+        <package name="com.zds.entity"/>
     </typeAliases>
     <environments default="dev">
         <environment id="dev">

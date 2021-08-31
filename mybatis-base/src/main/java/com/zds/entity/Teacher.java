@@ -1,4 +1,4 @@
-package com.zds.pojo;
+package com.zds.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,9 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Course {
+public class Teacher {
     private Long id;
-    private String cName;
-    // 教师id
-    private Long tId;
+    private String tName;
 }

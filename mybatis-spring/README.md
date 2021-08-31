@@ -93,7 +93,7 @@ application.xml
         <!-- 指定mapper扫描路径 -->
         <property name="mapperLocations" value="classpath:com/zds/mapper/*.xml"/>
         <!-- 指定设置javaBean的别名包路径 -->
-        <property name="typeAliasesPackage" value="com.zds.pojo"/>
+        <property name="typeAliasesPackage" value="com.zds.entity"/>
         <!-- 其他设置 -->
         <property name="configuration">
             <bean class="org.apache.ibatis.session.Configuration">
@@ -140,7 +140,7 @@ mybatis-config.xml
     </settings>
     <!-- 别名定义 -->
     <typeAliases>
-        <package name="com.zds.pojo"/>
+        <package name="com.zds.entity"/>
     </typeAliases>
 
     <mappers>

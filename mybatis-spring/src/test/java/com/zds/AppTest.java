@@ -1,7 +1,7 @@
 package com.zds;
 
 import com.zds.mapper.CustomMapper;
-import com.zds.pojo.Custom;
+import com.zds.entity.Custom;
 import com.zds.service.CustomService;
 import org.junit.Test;
 import org.junit.runner.RunWith;

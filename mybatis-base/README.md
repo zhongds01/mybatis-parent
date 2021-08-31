@@ -17,7 +17,7 @@ mybatis基本使用
     </settings>
     <!-- 别名定义 -->
     <typeAliases>
-        <package name="com.zds.pojo"/>
+        <package name="com.zds.entity"/>
     </typeAliases>
     <environments default="dev-dbcp2">
         <environment id="dev-default">
@@ -159,7 +159,7 @@ public class Custom implements Serializable {
 详细代码见源码
 
 ```java
-import com.zds.pojo.Custom;
+import com.zds.entity.Custom;
 import org.apache.ibatis.annotations.Param;
 
 public interface CustomMapper {
@@ -182,7 +182,7 @@ public interface CustomMapper {
 
 ```java
 import com.zds.mapper.CustomMapper;
-import com.zds.pojo.Custom;
+import com.zds.entity.Custom;
 import com.zds.util.SqlSessionUtil;
 import org.apache.ibatis.session.SqlSession;
 import org.junit.Test;

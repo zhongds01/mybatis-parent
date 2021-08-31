@@ -11,7 +11,7 @@
     </settings>
     <!-- 别名定义 -->
     <typeAliases>
-        <package name="com.zds.pojo"/>
+        <package name="com.zds.entity"/>
     </typeAliases>
 
     <mappers>

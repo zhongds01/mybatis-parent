@@ -1,6 +1,6 @@
 package com.zds.mapper;
 
-import com.zds.pojo.ScoreAndStudent;
+import com.zds.entity.ScoreAndStudent;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;

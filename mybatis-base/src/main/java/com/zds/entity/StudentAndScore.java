@@ -1,4 +1,4 @@
-package com.zds.pojo;
+package com.zds.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,13 +12,13 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ScoreAndStudent extends Score {
-    private Student student;
+public class StudentAndScore extends Student {
+    private List<Score> scoreList;
 
     @Override
     public String toString() {
-        return "ScoreAndStudent{" +
-                "student=" + student +
+        return "StudentAndScore{" +
+                "scoreList=" + scoreList +
                 "} " + super.toString();
     }
 }

@@ -97,23 +97,23 @@
         where stu.id = sc.s_id and stu.id = #{id}
     </select>
 
-    <resultMap id="studentWithScoreMap" type="com.zds.pojo.StudentAndScore" extends="studentMap">
-        <collection property="scoreList" ofType="com.zds.pojo.Score">
+    <resultMap id="studentWithScoreMap" type="com.zds.entity.StudentAndScore" extends="studentMap">
+        <collection property="scoreList" ofType="com.zds.entity.Score">
             <result property="sId" column="s_id"/>
             <result property="cId" column="c_id"/>
             <result property="score" column="score"/>
         </collection>
     </resultMap>
 
-    <resultMap id="studentMap" type="com.zds.pojo.Student">
+    <resultMap id="studentMap" type="com.zds.entity.Student">
         <id property="id" column="s_id"/>
         <result property="sName" column="s_name"/>
         <result property="sBirthday" column="s_birthday"/>
         <result property="sSex" column="s_sex"/>
     </resultMap>
 
-    <resultMap id="studentsWithTeachersMap" type="com.zds.pojo.StudentAndTeacher" extends="studentMap">
-        <collection property="teacherList" ofType="com.zds.pojo.Teacher">
+    <resultMap id="studentsWithTeachersMap" type="com.zds.entity.StudentAndTeacher" extends="studentMap">
+        <collection property="teacherList" ofType="com.zds.entity.Teacher">
             <id property="id" column="t_id"/>
             <result property="tName" column="t_name"/>
         </collection>

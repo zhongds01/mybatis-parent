@@ -1,11 +1,9 @@
 package com.zds.service.impl;
 
 import com.zds.mapper.CustomMapper;
-import com.zds.pojo.Custom;
+import com.zds.entity.Custom;
 import com.zds.service.CustomService;
-import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
