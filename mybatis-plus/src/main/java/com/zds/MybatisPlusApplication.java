@@ -3,6 +3,10 @@ package com.zds;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+/**
+ * @author zhongdongsheng
+ * @datetime 2021/9/1 09:50
+ */
 @SpringBootApplication
 public class MybatisPlusApplication {
 

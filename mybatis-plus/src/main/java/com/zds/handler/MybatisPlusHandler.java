@@ -7,8 +7,11 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.Date;
-import java.util.function.Supplier;
 
+/**
+ * @author zhongdongsheng
+ * @datetime 2021/9/1 09:50
+ */
 @Slf4j
 @Component
 public class MybatisPlusHandler implements MetaObjectHandler {
@@ -17,9 +20,9 @@ public class MybatisPlusHandler implements MetaObjectHandler {
         log.info("start insert fill ....");
         // this.strictInsertFill(metaObject, "createTime", LocalDateTime.class, LocalDateTime.now());
         // this.strictInsertFill(metaObject, "updateTime", LocalDateTime.class, LocalDateTime.now());
-        this.strictInsertFill(metaObject,"createTime",LocalDateTime::now,LocalDateTime.class);
+        this.strictInsertFill(metaObject, "createTime", Date::new, Date.class);
         this.strictInsertFill(metaObject, "updateTime", Date::new, Date.class);
-        this.strictInsertFill(metaObject, "idDeleted", () -> 0, Integer.class);
+        this.strictInsertFill(metaObject, "isDeleted", () -> 0, Integer.class);
     }
 
     @Override

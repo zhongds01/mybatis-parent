@@ -2,7 +2,6 @@ package com.zds.base;
 
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
-import lombok.experimental.Accessors;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
@@ -12,9 +11,7 @@ import java.util.Date;
  * @since 2021-8-31下午 9:37
  */
 @Data
-@Accessors(chain = true)
 public class BaseEntity {
-
     @TableId(
             value = "id",
             type = IdType.ASSIGN_ID
@@ -24,11 +21,13 @@ public class BaseEntity {
     @DateTimeFormat(
             pattern = "yyyy-MM-dd HH:mm:ss"
     )
+    @TableField(fill = FieldFill.INSERT)
     private Date createTime;
 
     @DateTimeFormat(
             pattern = "yyyy-MM-dd HH:mm:ss"
     )
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private Date updateTime;
 
     @TableField(fill = FieldFill.INSERT)

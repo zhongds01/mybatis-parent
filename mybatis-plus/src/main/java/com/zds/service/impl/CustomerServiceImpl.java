@@ -2,8 +2,8 @@ package com.zds.service.impl;
 
 import com.zds.base.BaseServiceImpl;
 import com.zds.entity.Customer;
-import com.zds.mapper.CustomMapper;
-import com.zds.service.ICustomService;
+import com.zds.mapper.CustomerMapper;
+import com.zds.service.ICustomerService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -15,6 +15,6 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class CustomServiceImpl extends BaseServiceImpl<CustomMapper, Customer> implements ICustomService {
+public class CustomerServiceImpl extends BaseServiceImpl<CustomerMapper, Customer> implements ICustomerService {
 
 }
