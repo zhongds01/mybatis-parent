@@ -52,6 +52,54 @@ spring.datasource.password=123456
 
 ## 3、编写与数据库对应的实体类
 
+> 编写基类，存放主键id，创建时间，更新时间，逻辑删除等字段
+
+```java
+@Data
+@Accessors(chain = true)
+public class BaseEntity {
+    @TableId(
+        value = "id",
+        type = IdType.ASSIGN_ID
+    )
+    private Long id;
+
+    @DateTimeFormat(
+        pattern = "yyyy-MM-dd HH:mm:ss"
+    )
+    @TableField(fill = FieldFill.INSERT)
+    private Date createTime;
+
+    @DateTimeFormat(
+        pattern = "yyyy-MM-dd HH:mm:ss"
+    )
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+    private Date updateTime;
+
+    @TableField(fill = FieldFill.INSERT)
+    @TableLogic()
+    private Integer isDeleted;
+}
+```
+
+> 创建数据库实体类，继承基类BaseEntity
+
+```java
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Accessors(chain = true)
+public class Customer extends BaseEntity implements Serializable {
+    private static final long serialVersionUID = 9157528864358633663L;
+    private String customerName;
+    private String customerPassword;
+    private String customerSex;
+    private String customerTel;
+    private String customerEmail;
+    private String customerAddress;
+}
+```
+
 
 
 ## 4、编写mapper接口
@@ -63,7 +111,7 @@ public interface CustomMapper extends BaseMapper<Custom> {
 }
 ```
 
-## 4、在springboot启动类上加上mapper接口包路径扫描，或在自定义配置类上加
+## 5、在springboot启动类上加上mapper接口包路径扫描，或在自定义配置类上加
 
 ```java
 @Configuration
@@ -72,5 +120,391 @@ public class MybatisPlusConfig {
 }
 ```
 
-## 5、编写测试类
+## 6、编写测试类
+
+```java
+@Test
+void testInsert() {
+    Customer customer = new Customer().setCustomerName("zhouniang").setCustomerPassword("123456").setCustomerSex("男").setCustomerTel("13260900000").setCustomerEmail("zhongds01@163.com").setCustomerAddress("Wuxi");
+    int rows = customMapper.insert(customer);
+    System.out.println("insert rows = " + rows);
+}
+```
+
+## 7、条件构造器
+
+### 7.1、AbstractWrapper
+
+#### 7.1.1、allEq
+
+> 全部等于或如果为null，可以为is null 也可以不存在
+
+```java
+public <V> Children allEq(boolean condition, BiPredicate<R, V> filter, Map<R, V> params, boolean null2IsNull)
+// condition：当前条件是否生效（true：生效，false：不生效）
+// filter：过滤params中符合要求的键值对
+// params：查询条件，封装在map中，key为列名，value为列值
+// null2IsNull：如果map中存在key对应的value为null的情况。（true：查询条件变为key对应的列名 is null，false：查询条件没有该key对应的列名）
+map.put("customer_name", "zhouliang");
+map.put("customer_sex", "男");
+map.put("customer_password", null);
+new QueryWrapper<Customer>().allEq(true, (k, v) -> k.equals("customer_name"), map, true);
+// 由于使用了过滤规则，过滤出当map的key为customer_name作为查询条件，因此生成的sql为
+// SELECT id,customer_name,customer_password,customer_sex,customer_tel,customer_email,customer_address,create_time,update_time,is_deleted FROM customer WHERE is_deleted=0 AND (customer_name = ?)
+new QueryWrapper<Customer>().allEq(true, map, true);
+// 移除过滤规则，但设置了null2IsNull为true，因此sql为
+// SELECT id,customer_name,customer_password,customer_sex,customer_tel,customer_email,customer_address,create_time,update_time,is_deleted FROM customer WHERE is_deleted=0 AND (customer_password IS NULL AND customer_sex = ? AND customer_name = ?)
+new QueryWrapper<Customer>().allEq(true, map, false);
+// 移除过滤规则，但设置了null2IsNull为false，因此sql为
+// SELECT id,customer_name,customer_password,customer_sex,customer_tel,customer_email,customer_address,create_time,update_time,is_deleted FROM customer WHERE is_deleted=0 AND (customer_sex = ? AND customer_name = ?)
+new QueryWrapper<Customer>().allEq(false, (k, v) -> k.equals("customer_name"), map, true);
+// 设置condition为false，sql为
+// SELECT id,customer_name,customer_password,customer_sex,customer_tel,customer_email,customer_address,create_time,update_time,is_deleted FROM customer WHERE is_deleted=0
+```
+
+#### 7.1.2、eq
+
+> 等于
+
+```java
+customerMapper.selectList(new QueryWrapper<Customer>().eq(true, "id", 1432873878224494594L)).forEach(System.out::println);
+// sql为
+// SELECT id,customer_name,customer_password,customer_sex,customer_tel,customer_email,customer_address,create_time,update_time,is_deleted FROM customer WHERE is_deleted=0 AND (id = ?)
+```
+
+#### 7.1.3、ne
+
+> 不等于
+
+```java
+customerMapper.selectList(new QueryWrapper<Customer>().ne(true, "id", 1432873878224494594L)).forEach(System.out::println);
+// SELECT id,customer_name,customer_password,customer_sex,customer_tel,customer_email,customer_address,create_time,update_time,is_deleted FROM customer WHERE is_deleted=0 AND (id <> ?)
+```
+
+#### 7.1.4、gt
+
+> 大于
+
+```java
+customerMapper.selectList(new QueryWrapper<Customer>().gt(true, "id", 1432873878224494594L)).forEach(System.out::println);
+// SELECT id,customer_name,customer_password,customer_sex,customer_tel,customer_email,customer_address,create_time,update_time,is_deleted FROM customer WHERE is_deleted=0 AND (id > ?)
+```
+
+#### 7.1.5、ge
+
+> 大于等于
+
+```java
+customerMapper.selectList(new QueryWrapper<Customer>().ge(true, "id", 1432873878224494594L)).forEach(System.out::println);
+// SELECT id,customer_name,customer_password,customer_sex,customer_tel,customer_email,customer_address,create_time,update_time,is_deleted FROM customer WHERE is_deleted=0 AND (id >= ?)
+```
+
+#### 7.1.6、lt
+
+> 小于
+
+```java
+customerMapper.selectList(new QueryWrapper<Customer>().lt(true, "id", 1432873878224494594L)).forEach(System.out::println);
+// SELECT id,customer_name,customer_password,customer_sex,customer_tel,customer_email,customer_address,create_time,update_time,is_deleted FROM customer WHERE is_deleted=0 AND (id < ?)
+```
+
+#### 7.1.7、le
+
+> 小于等于
+
+```java
+customerMapper.selectList(new QueryWrapper<Customer>().le(true, "id", 1432873878224494594L)).forEach(System.out::println);
+// SELECT id,customer_name,customer_password,customer_sex,customer_tel,customer_email,customer_address,create_time,update_time,is_deleted FROM customer WHERE is_deleted=0 AND (id <= ?)
+```
+
+#### 7.1.8、between
+
+> BETWEEN 值1 AND 值2
+
+```java
+customerMapper.selectList(new QueryWrapper<Customer>().between(true, "id", 1432873878224494593L, 1432873878224494594L)).forEach(System.out::println);
+// SELECT id,customer_name,customer_password,customer_sex,customer_tel,customer_email,customer_address,create_time,update_time,is_deleted FROM customer WHERE is_deleted=0 AND (id BETWEEN ? AND ?)
+```
+
+#### 7.1.9、notbetween
+
+> NOT BETWEEN 值1 AND 值2
+
+```java
+customerMapper.selectList(new QueryWrapper<Customer>().notBetween(true, "id", 1432873878224494593L, 1432873878224494594L)).forEach(System.out::println);
+// SELECT id,customer_name,customer_password,customer_sex,customer_tel,customer_email,customer_address,create_time,update_time,is_deleted FROM customer WHERE is_deleted=0 AND (id NOT BETWEEN ? AND ?)
+```
+
+#### 7.1.10、like
+
+> 模糊查询，自动在模糊查询值左右两侧添加%
+
+```java
+customerMapper.selectList(new QueryWrapper<Customer>().like(true, "id", "11")).forEach(System.out::println);
+// Preparing: SELECT id,customer_name,customer_password,customer_sex,customer_tel,customer_email,customer_address,create_time,update_time,is_deleted FROM customer WHERE is_deleted=0 AND (id LIKE ?)
+// Parameters: %11%(String)
+```
+
+#### 7.1.11、notlike
+
+```java
+customerMapper.selectList(new QueryWrapper<Customer>().notLike(true, "id", "11")).forEach(System.out::println);
+// SELECT id,customer_name,customer_password,customer_sex,customer_tel,customer_email,customer_address,create_time,update_time,is_deleted FROM customer WHERE is_deleted=0 AND (id NOT LIKE ?)
+// Parameters: %11%(String)
+```
+
+#### 7.1.12、likeLeft
+
+> 在模糊查询值左侧添加%，即以指定值结尾的模糊查询
+
+```java
+customerMapper.selectList(new QueryWrapper<Customer>().likeLeft(true, "id", "11")).forEach(System.out::println);
+// SELECT id,customer_name,customer_password,customer_sex,customer_tel,customer_email,customer_address,create_time,update_time,is_deleted FROM customer WHERE is_deleted=0 AND (id LIKE ?)
+// Parameters: %11(String)
+```
+
+#### 7.1.13、likeRight
+
+> 在模糊查询值右侧添加%，即以指定值开头的模糊查询
+
+```java
+customerMapper.selectList(new QueryWrapper<Customer>().likeRight(true, "id", "11")).forEach(System.out::println);
+// SELECT id,customer_name,customer_password,customer_sex,customer_tel,customer_email,customer_address,create_time,update_time,is_deleted FROM customer WHERE is_deleted=0 AND (id LIKE ?)
+// Parameters: 11%(String)
+```
+
+#### 7.1.14、isNull
+
+> 判断字段为null
+
+```java
+customerMapper.selectList(new QueryWrapper<Customer>().isNull(true, "id")).forEach(System.out::println);
+// SELECT id,customer_name,customer_password,customer_sex,customer_tel,customer_email,customer_address,create_time,update_time,is_deleted FROM customer WHERE is_deleted=0 AND (id IS NULL)
+```
+
+#### 7.1.15、isNotNull
+
+> 判断字段不为null
+
+```java
+customerMapper.selectList(new QueryWrapper<Customer>().isNotNull(true, "id")).forEach(System.out::println);
+// SELECT id,customer_name,customer_password,customer_sex,customer_tel,customer_email,customer_address,create_time,update_time,is_deleted FROM customer WHERE is_deleted=0 AND (id IS NOT NULL)
+```
+
+#### 7.1.16、in
+
+> in (xx,xx,xx)
+
+```java
+customerMapper.selectList(new QueryWrapper<Customer>().in(true, "id", 1432873878224494594L, 1432873878224494595L, 1432873878224494596L)).forEach(System.out::println);
+customerMapper.selectList(new QueryWrapper<Customer>().in(true, "id", Arrays.asList(1432873878224494594L, 1432873878224494595L, 1432873878224494596L))).forEach(System.out::println);
+// SELECT id,customer_name,customer_password,customer_sex,customer_tel,customer_email,customer_address,create_time,update_time,is_deleted FROM customer WHERE is_deleted=0 AND (id IN (?,?,?))
+```
+
+#### 7.1.17、not in
+
+> not in (xx,xx,xx)
+
+```JAVA
+customerMapper.selectList(new QueryWrapper<Customer>().notIn(true, "id", 1432873878224494594L, 1432873878224494595L, 1432873878224494596L)).forEach(System.out::println);
+customerMapper.selectList(new QueryWrapper<Customer>().notIn(true, "id", Arrays.asList(1432873878224494594L, 1432873878224494595L, 1432873878224494596L))).forEach(System.out::println);
+// SELECT id,customer_name,customer_password,customer_sex,customer_tel,customer_email,customer_address,create_time,update_time,is_deleted FROM customer WHERE is_deleted=0 AND (id NOT IN (?,?,?))
+```
+
+#### 7.1.18、inSql
+
+> in子查询
+
+```java
+customerMapper.selectList(new QueryWrapper<Customer>().inSql(true, "id", "select id from customer")).forEach(System.out::println);
+customerMapper.selectList(new QueryWrapper<Customer>().inSql(true, "id", "1,2,3,4,5,6")).forEach(System.out::println);
+// SELECT id,customer_name,customer_password,customer_sex,customer_tel,customer_email,customer_address,create_time,update_time,is_deleted FROM customer WHERE is_deleted=0 AND (id IN (select id from customer))
+```
+
+#### 7.1.19、notInSql
+
+```java
+customerMapper.selectList(new QueryWrapper<Customer>().notInSql(true, "id","select id from customer")).forEach(System.out::println);
+customerMapper.selectList(new QueryWrapper<Customer>().notInSql(true, "id", "1,2,3,4,5,6")).forEach(System.out::println);
+// SELECT id,customer_name,customer_password,customer_sex,customer_tel,customer_email,customer_address,create_time,update_time,is_deleted FROM customer WHERE is_deleted=0 AND (id NOT IN (select id from customer))
+```
+
+#### 7.1.20、exists
+
+> 子查询
+
+```java
+customerMapper.selectList(new QueryWrapper<Customer>().exists(true, "select id from customer where id = 1")).forEach(System.out::println);
+// SELECT id,customer_name,customer_password,customer_sex,customer_tel,customer_email,customer_address,create_time,update_time,is_deleted FROM customer WHERE is_deleted=0 AND (EXISTS (select id from customer where id = 1))
+```
+
+#### 7.1.21、notExists
+
+```java
+customerMapper.selectList(new QueryWrapper<Customer>().notExists(true, "select id from customer where id = 1")).forEach(System.out::println);
+// SELECT id,customer_name,customer_password,customer_sex,customer_tel,customer_email,customer_address,create_time,update_time,is_deleted FROM customer WHERE is_deleted=0 AND (NOT EXISTS (select id from customer where id = 1))
+```
+
+#### 7.1.22、orderBy
+
+> 排序，可指定排序规则
+
+```java
+// orderBy(boolean condition, boolean isAsc, List<R> columns)
+// condition：true/false，sql是否生效
+// isAsc：true/false，是否升序排列
+// columns：指定根据排序的列
+customerMapper.selectList(new QueryWrapper<Customer>().orderBy(true, true, Arrays.asList("id", "customer_name"))).forEach(System.out::println);
+// SELECT  id,customer_name,customer_password,customer_sex,customer_tel,customer_email,customer_address,create_time,update_time,is_deleted FROM customer WHERE is_deleted=0 ORDER BY id ASC,customer_name ASC
+```
+
+#### 7.1.23、orderByAsc
+
+> 升序排序
+
+```java
+customerMapper.selectList(new QueryWrapper<Customer>().orderByAsc(true, Arrays.asList("id","customer_name"))).forEach(System.out::println);
+// SELECT id,customer_name,customer_password,customer_sex,customer_tel,customer_email,customer_address,create_time,update_time,is_deleted FROM customer WHERE is_deleted=0 ORDER BY id ASC,customer_name ASC
+```
+
+#### 7.1.24、orderByDesc
+
+> 降序排序
+
+```java
+customerMapper.selectList(new QueryWrapper<Customer>().orderByDesc(true, Arrays.asList("id", "customer_name"))).forEach(System.out::println);
+// SELECT id,customer_name,customer_password,customer_sex,customer_tel,customer_email,customer_address,create_time,update_time,is_deleted FROM customer WHERE is_deleted=0 ORDER BY id DESC,customer_name DESC
+```
+
+#### 7.1.25、groupBy
+
+> 分组查询
+
+```java
+customerMapper.selectList(new QueryWrapper<Customer>().select("id","customer_name").groupBy(true, Arrays.asList("id", "customer_name"))).forEach(System.out::println);
+// SELECT id,customer_name FROM customer WHERE is_deleted=0 GROUP BY id,customer_name
+```
+
+#### 7.1.26、having
+
+> 分组查询条件
+
+```java
+having(boolean condition, String sqlHaving, Object... params);
+// condition：true/false，sql是否生效
+// sqlHaving：分组查询条件sql
+// 动态传入分组查询条件sql的值，使用方式在sqlHaving中使用{0},{1}...
+customerMapper.selectList(new QueryWrapper<Customer>().select("id","customer_name").groupBy(true, Arrays.asList("id", "customer_name")).having("count(1) >= 0")).forEach(System.out::println);
+customerMapper.selectList(new QueryWrapper<Customer>().select("id","customer_name").groupBy(true, Arrays.asList("id", "customer_name")).having("count(1) >= {0}",1)).forEach(System.out::println);
+// SELECT id,customer_name FROM customer WHERE is_deleted=0 GROUP BY id,customer_name HAVING count(1) >= 0
+```
+
+#### 7.1.27、func
+
+> func 方法(主要方便在出现if...else下调用不同方法能不断链)
+
+```java
+customerMapper.selectList(new QueryWrapper<Customer>().eq("id", 3L).func(true, customerQueryWrapper -> {
+    if (true) {
+        customerQueryWrapper.eq("id",1L);
+    } else {
+        customerQueryWrapper.eq("id",2L);
+    }
+})).forEach(System.out::println);
+// SELECT id,customer_name,customer_password,customer_sex,customer_tel,customer_email,customer_address,create_time,update_time,is_deleted FROM customer WHERE is_deleted=0 AND (id = ? AND id = ?)
+```
+
+#### 7.1.28、or
+
+> 使用or嵌套sql
+
+```java
+customerMapper.selectList(new QueryWrapper<Customer>().eq("id",1L).or(true, customerQueryWrapper -> {
+    customerQueryWrapper.eq("id",2L);
+})).forEach(System.out::println);
+// SELECT id,customer_name,customer_password,customer_sex,customer_tel,customer_email,customer_address,create_time,update_time,is_deleted FROM customer WHERE is_deleted=0 AND (id = ? OR (id = ?))
+```
+
+#### 7.1.29、and
+
+> 使用and嵌套sql，与func区分下
+
+```java
+customerMapper.selectList(new QueryWrapper<Customer>().eq("id", 1L).and(true, customerQueryWrapper -> {
+    customerQueryWrapper.eq("id", 2L);
+})).forEach(System.out::println);
+// SELECT id,customer_name,customer_password,customer_sex,customer_tel,customer_email,customer_address,create_time,update_time,is_deleted FROM customer WHERE is_deleted=0 AND (id = ? AND (id = ?))
+```
+
+#### 7.1.30、nested
+
+> 正常嵌套，不使用and或or
+
+```java
+customerMapper.selectList(new QueryWrapper<Customer>().eq("id", 1L).nested(true, customerQueryWrapper -> {
+    customerQueryWrapper.eq("id", 2L).ge("id",3L);
+})).forEach(System.out::println);
+// SELECT id,customer_name,customer_password,customer_sex,customer_tel,customer_email,customer_address,create_time,update_time,is_deleted FROM customer WHERE is_deleted=0 AND (id = ? AND (id = ? AND id >= ?))
+```
+
+#### 7.1.31、apply
+
+> sql拼接
+>
+> 该方法可用于数据库**函数** 动态入参的`params`对应前面`applySql`内部的`{index}`部分.这样是不会有sql注入风险的,反之会有!
+
+```java
+customerMapper.selectList(new QueryWrapper<Customer>().apply("id = {0} and customer_name = {1}", 1L, "zhongdongsheng")).forEach(System.out::println);
+// SELECT id,customer_name,customer_password,customer_sex,customer_tel,customer_email,customer_address,create_time,update_time,is_deleted FROM customer WHERE is_deleted=0 AND (id = ? and customer_name = ?)
+```
+
+#### 7.1.32、last
+
+> 无视优化规则直接拼接到 sql 的最后
+>
+> 只能调用一次,多次调用以最后一次为准 有sql注入的风险,请谨慎使用
+
+```java
+last("limit 1")
+```
+
+### 7.2、QueryWrapper
+
+#### 7.2.1、select
+
+> 指定查询的字段
+
+```java
+/**
+     * Query.java
+     * 过滤查询的字段信息(主键除外!)
+     * <p>例1: 只要 java 字段名以 "test" 开头的             -> select(i -> i.getProperty().startsWith("test"))</p>
+     * <p>例2: 只要 java 字段属性是 CharSequence 类型的     -> select(TableFieldInfo::isCharSequence)</p>
+     * <p>例3: 只要 java 字段没有填充策略的                 -> select(i -> i.getFieldFill() == FieldFill.DEFAULT)</p>
+     * <p>例4: 要全部字段                                   -> select(i -> true)</p>
+     * <p>例5: 只要主键字段                                 -> select(i -> false)</p>
+     *
+     * @param predicate 过滤方式
+     * @return children
+     */
+customerMapper.selectList(new QueryWrapper<Customer>().select(Customer.class, tableFieldInfo -> true).apply("id = {0} and customer_name = {1}", 1L, "zhongdongsheng")).forEach(System.out::println);
+// SELECT id,customer_name,customer_password,customer_sex,customer_tel,customer_email,customer_address,create_time,update_time,is_deleted FROM customer WHERE is_deleted=0 AND (id = ? and customer_name = ?)
+
+customerMapper.selectList(new QueryWrapper<Customer>().select("id","customer_name").apply("id = {0} and customer_name = {1}", 1L, "zhongdongsheng")).forEach(System.out::println);
+// SELECT id,customer_name FROM customer WHERE is_deleted=0 AND (id = ? and customer_name = ?)
+```
+
+
+
+### 7.3、UpdateWrapper
+
+#### 7.3.1、set
+
+```java
+customerMapper.update(null, new UpdateWrapper<Customer>().set("customer_name", "zhongdongsheng").set("customer_sex", "女").eq("id", 1L));
+// UPDATE customer SET customer_name=?,customer_sex=? WHERE is_deleted=0 AND (id = ?)
+
+customerMapper.update(null, new UpdateWrapper<Customer>().setSql("customer_name = 'zhongdongsheng'").set("customer_sex", "女").eq("id", 1L));
+// UPDATE customer SET customer_name = 'zhongdongsheng',customer_sex=? WHERE is_deleted=0 AND (id = ?)
+```
 
