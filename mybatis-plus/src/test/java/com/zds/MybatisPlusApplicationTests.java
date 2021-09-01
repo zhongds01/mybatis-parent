@@ -1,7 +1,8 @@
 package com.zds;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.zds.entity.Customer;
 import com.zds.mapper.CustomerMapper;
 import org.junit.jupiter.api.Test;
@@ -9,7 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @SpringBootTest
 class MybatisPlusApplicationTests {
@@ -19,9 +23,73 @@ class MybatisPlusApplicationTests {
 
     @Test
     void testInsert() {
-        Customer customer = new Customer().setCustomerName("zhouliang").setCustomerPassword("123456").setCustomerSex("男").setCustomerTel("13260900000").setCustomerEmail("zhongds01@163.com").setCustomerAddress("Wuxi");
+        Customer customer = new Customer().setCustomerName("zhongdongsheng").setCustomerPassword("123456").setCustomerSex("男").setCustomerTel("13260900000").setCustomerEmail("zhongds01@163.com").setCustomerAddress("Wuxi");
         int rows = customerMapper.insert(customer);
         System.out.println("insert rows = " + rows);
+    }
+
+    @Test
+    void testDelete() {
+        // 方式1、使用delete方法
+        System.out.println("delete rows is " + customerMapper.delete(Wrappers.<Customer>lambdaQuery().eq(Customer::getId, 1432900627591094273L)));
+        // 方式2、使用deleteById方法
+        System.out.println("delete rows is " + customerMapper.deleteById(1432900627591094273L));
+        // 方式3、使用deleteBatchIds方法批量删除
+        System.out.println("delete rows is " + customerMapper.deleteBatchIds(Arrays.asList(1432900627591094273L, 1432900627591094274L)));
+        // 方式4、使用deleteByMap删除
+        Map<String, Object> map = new HashMap<>();
+        map.put("id", 1432900627591094273L);
+        map.put("customer_name", "zhouliang");
+        System.out.println("delete rows is " + customerMapper.deleteByMap(map));
+    }
+
+    @Test
+    void testUpdate() {
+        // 方式1、使用updateById方法
+        Customer customer = new Customer().setCustomerName("zhongdongsheng").setCustomerAddress("Nanjing").setCustomerSex("男");
+        customer.setId(1432971951265148930L);
+        System.out.println("update rows is " + customerMapper.updateById(customer));
+        // updateWrapper不会自动更新update_time字段
+        System.out.println("delete rows is " + customerMapper.update(null, Wrappers.<Customer>lambdaUpdate().eq(Customer::getId, 1432971951265148930L).set(Customer::getCustomerName, "zhouliang")));
+    }
+
+    @Test
+    void testSelect() {
+        // 方式1、使用selectOne方法查询单条记录，如果返回多条，抛异常。
+        Customer customer = customerMapper.selectOne(Wrappers.<Customer>lambdaQuery().eq(Customer::getId, 1432971951265148930L).like(Customer::getCustomerName, "dong"));
+        System.out.println(customer);
+        // 方式2、使用selectById方法查询单条记录。
+        Customer customerOne = customerMapper.selectById(1432971951265148930L);
+        System.out.println(customerOne);
+        // 方式3、使用selectList方法查询多条记录。
+        List<Customer> customers = customerMapper.selectList(Wrappers.<Customer>lambdaQuery().eq(Customer::getCustomerSex, "男").like(Customer::getCustomerName, "dong"));
+        customers.forEach(System.out::println);
+        // 方式4、使用selectBatchIds方法查询多条记录。
+        List<Customer> customersByBatchIds = customerMapper.selectBatchIds(Arrays.asList(1432971951265148930L, 1432971951265148931L));
+        customersByBatchIds.forEach(System.out::println);
+        // 方式5、使用selectCount方法查询记录总数。
+        Integer count = customerMapper.selectCount(Wrappers.<Customer>lambdaQuery().eq(Customer::getCustomerSex, "男").like(Customer::getCustomerName, "dong"));
+        System.out.println("count = " + count);
+        // 方式6、使用selectByMap方法查询多条记录。
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("id", 1432971951265148930L);
+        map.put("customer_name", "zhouliang");
+        List<Customer> customersByMap = customerMapper.selectByMap(map);
+        customersByMap.forEach(System.out::println);
+        // 方式7、使用selectMaps方法查询记录总数,结果集以map形式封装，而不是实体类。
+        List<Map<String, Object>> maps = customerMapper.selectMaps(Wrappers.<Customer>lambdaQuery().eq(Customer::getCustomerSex, "男").like(Customer::getCustomerName, "dong"));
+        maps.forEach(System.out::println);
+        // 方式8、使用selectObjs方法查询记录总数,指挥返回查询的第一列。
+        List<Object> objects = customerMapper.selectObjs(Wrappers.<Customer>lambdaQuery().eq(Customer::getCustomerSex, "男").like(Customer::getCustomerName, "dong"));
+        objects.forEach(System.out::println);
+        // 方式9、使用selectPage方法分页查询。
+        Page<Customer> page = new Page<>(1, 5);
+        customerMapper.selectPage(page, Wrappers.<Customer>lambdaQuery().eq(Customer::getCustomerSex, "男").like(Customer::getCustomerName, "dong"));
+        page.getRecords().forEach(System.out::println);
+        // 方式10、使用selectMapsPage方法分页查询，结果集使用map形式保存。
+        Page<Map<String,Object>> pageMap = new Page<>(1,5);
+        customerMapper.selectMapsPage(pageMap, Wrappers.<Customer>lambdaQuery().eq(Customer::getCustomerSex, "男").like(Customer::getCustomerName, "dong"));
+        pageMap.getRecords().forEach(System.out::println);
     }
 
     @Test
@@ -83,9 +151,17 @@ class MybatisPlusApplicationTests {
     }
 
     @Test
-    void testUpdate() {
-        customerMapper.update(null, new UpdateWrapper<Customer>().set("customer_name", "zhongdongsheng").set("customer_sex", "女").eq("id", 1L));
-        customerMapper.update(null, new UpdateWrapper<Customer>().setSql("customer_name = 'zhongdongsheng'").set("customer_sex", "女").eq("id", 1L));
+    void testTransaction() {
+        Customer customer = new Customer().setCustomerName("zhongdongsheng").setCustomerPassword("123456").setCustomerSex("男").setCustomerTel("13260900000").setCustomerEmail("zhongds01@163.com").setCustomerAddress("Wuxi");
+        customerMapper.insert(customer);
+        int i = 1/0;
+    }
+
+    @Test
+    void testPaginationSelect() {
+        Page<Customer> page = new Page<>(2, 5);
+        Page<Customer> customerPage = customerMapper.selectPage(page, Wrappers.<Customer>lambdaQuery().eq(Customer::getCustomerName, "zhouliang").orderByDesc(Customer::getId));
+        customerPage.getRecords().forEach(System.out::println);
     }
 
 

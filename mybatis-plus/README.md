@@ -508,3 +508,187 @@ customerMapper.update(null, new UpdateWrapper<Customer>().setSql("customer_name 
 // UPDATE customer SET customer_name = 'zhongdongsheng',customer_sex=? WHERE is_deleted=0 AND (id = ?)
 ```
 
+## 8、分页插件
+
+### 8.1、配置分页插件
+
+> 在自定义的配置类中，配置分页插件。只需要在mybatisplus提供的拦截器链中加入分页插件的拦截器类
+
+```java
+@Bean
+public MybatisPlusInterceptor mybatisPlusInterceptor() {
+    MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
+    interceptor.addInnerInterceptor(new PaginationInnerInterceptor(DbType.MYSQL));
+    return interceptor;
+}
+```
+
+### 8.2、编写测试类测试
+
+```java
+@Test
+void testPaginationSelect() {
+    Page<Customer> page = new Page<>(2,5);
+    Page<Customer> customerPage = customerMapper.selectPage(page, Wrappers.<Customer>lambdaQuery().eq(Customer::getCustomerName,"zhouliang").orderByDesc(Customer::getId));
+    customerPage.getRecords().forEach(System.out::println);
+}
+```
+
+执行sql语句前，会先执行查询所有数量的sql。
+
+执行sql语句后，会返回分页对象，该对象中的records属性就是封装的我们要查询的对象List集合。此外，分页对象中还会保存所有记录数以及当前返回的记录数
+
+## 9、主键生成策略
+
+### 9.1、Mybatis-plus默认的机制
+
+| 主键生成方式       | 说明                                                         |
+| ------------------ | ------------------------------------------------------------ |
+| IdType.AUTO        | 主键自增，需在表结构设计时设置为主键为自增                   |
+| IdType.NONE        | 无状态（测试发现，若有手动设置主键值，则使用手动设置的值，如果没有，则使用雪花算法IdType.ASSIGN_ID） |
+| IdType.INPUT       | 插入前手动设置主键的值                                       |
+| IdType.ASSIGN_ID   | 分配ID(主键类型为Number(Long和Integer)或String)(since 3.3.0),使用接口`IdentifierGenerator`的方法`nextId`(默认实现类为`DefaultIdentifierGenerator`雪花算法) |
+| IdType.ASSIGN_UUID | 分配UUID,主键类型为String(since 3.3.0),使用接口`IdentifierGenerator`的方法`nextUUID`(默认default方法) |
+
+### 9.2、自定义主键生成策略
+
+#### 9.2.1、声明为Bean供Spring扫描注入
+
+```java
+@Slf4j
+@Component
+public class CustomIdGenerator implements IdentifierGenerator {
+
+    @Override
+    public String nextUUID(Object entity) {
+        log.info("使用自定义主键生成策略ASSIGN_UUID");
+        return "111";
+    }
+
+    @Override
+    public Number nextId(Object entity) {
+        log.info("使用自定义主键生成策略ASSIGN_ID");
+        return 123L;
+    }
+}
+```
+
+#### 9.2.2、使用配置类
+
+```java
+/**
+ * 自定义主键生成策略方式2，覆盖掉mybatis-plus中的默认策略
+ */   
+@Bean
+public IdentifierGenerator identifierGenerator() {
+    return new CustomIdGenerator();
+}
+```
+
+
+
+#### 9.2.3、通过MybatisPlusPropertiesCustomizer自定义
+
+```java
+@Bean
+public MybatisPlusPropertiesCustomizer plusPropertiesCustomizer() {
+    return plusProperties -> plusProperties.getGlobalConfig().setIdentifierGenerator(new CustomIdGenerator());
+}
+```
+
+## 10、内置CRUD接口
+
+### 10.1、dao层（mapper层）
+
+> 实现方式：自定义接口继承mp提供的BaseMapper接口。就可以通过实例化自定义接口调用内置的CRUD方法
+
+#### 10.1.1、insert
+
+```java
+@Test
+void testInsert() {
+    Customer customer = new Customer().setCustomerName("zhongdongsheng").setCustomerPassword("123456").setCustomerSex("男").setCustomerTel("13260900000").setCustomerEmail("zhongds01@163.com").setCustomerAddress("Wuxi");
+    int rows = customerMapper.insert(customer);
+    System.out.println("insert rows = " + rows);
+}
+```
+
+#### 10.1.2、delete
+
+```java
+@Test
+void testDelete() {
+    // 方式1、使用delete方法
+    System.out.println("delete rows is " + customerMapper.delete(Wrappers.<Customer>lambdaQuery().eq(Customer::getId, 1432900627591094273L)));
+    // 方式2、使用deleteById方法
+    System.out.println("delete rows is " + customerMapper.deleteById(1432900627591094273L));
+    // 方式3、使用deleteBatchIds方法批量删除
+    System.out.println("delete rows is " + customerMapper.deleteBatchIds(Arrays.asList(1432900627591094273L, 1432900627591094274L)));
+    // 方式4、使用deleteByMap删除
+    Map<String, Object> map = new HashMap<>();
+    map.put("id", 1432900627591094273L);
+    map.put("customer_name", "zhouliang");
+    System.out.println("delete rows is " + customerMapper.deleteByMap(map));
+}
+```
+
+#### 10.1.3、update
+
+>  **在使用UpdateWrapper条件构造器时，不会自动更新填充字段update_time字段**
+
+```java
+@Test
+void testUpdate() {
+    // 方式1、使用updateById方法
+    Customer customer = new Customer().setCustomerName("zhongdongsheng").setCustomerAddress("Nanjing").setCustomerSex("男");
+    // customer.setId(1432971951265148930L);
+    System.out.println("update rows is " + customerMapper.updateById(customer));
+    // updateWrapper不会自动更新update_time字段
+    System.out.println("delete rows is " + customerMapper.update(null, Wrappers.<Customer>lambdaUpdate().eq(Customer::getId, 1432971951265148930L).set(Customer::getCustomerName, "zhouliang")));
+}
+```
+
+#### 10.1.4、select
+
+```java
+@Test
+void testSelect() {
+    // 方式1、使用selectOne方法查询单条记录，如果返回多条，抛异常。
+    Customer customer = customerMapper.selectOne(Wrappers.<Customer>lambdaQuery().eq(Customer::getId, 1432971951265148930L).like(Customer::getCustomerName, "dong"));
+    System.out.println(customer);
+    // 方式2、使用selectById方法查询单条记录。
+    Customer customerOne = customerMapper.selectById(1432971951265148930L);
+    System.out.println(customerOne);
+    // 方式3、使用selectList方法查询多条记录。
+    List<Customer> customers = customerMapper.selectList(Wrappers.<Customer>lambdaQuery().eq(Customer::getCustomerSex, "男").like(Customer::getCustomerName, "dong"));
+    customers.forEach(System.out::println);
+    // 方式4、使用selectBatchIds方法查询多条记录。
+    List<Customer> customersByBatchIds = customerMapper.selectBatchIds(Arrays.asList(1432971951265148930L, 1432971951265148931L));
+    customersByBatchIds.forEach(System.out::println);
+    // 方式5、使用selectCount方法查询记录总数。
+    Integer count = customerMapper.selectCount(Wrappers.<Customer>lambdaQuery().eq(Customer::getCustomerSex, "男").like(Customer::getCustomerName, "dong"));
+    System.out.println("count = " + count);
+    // 方式6、使用selectByMap方法查询多条记录。
+    HashMap<String, Object> map = new HashMap<>();
+    map.put("id", 1432971951265148930L);
+    map.put("customer_name", "zhouliang");
+    List<Customer> customersByMap = customerMapper.selectByMap(map);
+    customersByMap.forEach(System.out::println);
+    // 方式7、使用selectMaps方法查询记录总数,结果集以map形式封装，而不是实体类。
+    List<Map<String, Object>> maps = customerMapper.selectMaps(Wrappers.<Customer>lambdaQuery().eq(Customer::getCustomerSex, "男").like(Customer::getCustomerName, "dong"));
+    maps.forEach(System.out::println);
+    // 方式8、使用selectObjs方法查询记录总数,指挥返回查询的第一列。
+    List<Object> objects = customerMapper.selectObjs(Wrappers.<Customer>lambdaQuery().eq(Customer::getCustomerSex, "男").like(Customer::getCustomerName, "dong"));
+    objects.forEach(System.out::println);
+    // 方式9、使用selectPage方法分页查询。
+    Page<Customer> page = new Page<>(1, 5);
+    customerMapper.selectPage(page, Wrappers.<Customer>lambdaQuery().eq(Customer::getCustomerSex, "男").like(Customer::getCustomerName, "dong"));
+    page.getRecords().forEach(System.out::println);
+    // 方式10、使用selectMapsPage方法分页查询，结果集使用map形式保存。
+    Page<Map<String,Object>> pageMap = new Page<>(1,5);
+    customerMapper.selectMapsPage(pageMap, Wrappers.<Customer>lambdaQuery().eq(Customer::getCustomerSex, "男").like(Customer::getCustomerName, "dong"));
+    pageMap.getRecords().forEach(System.out::println);
+}
+```
+
+### 10.2、service层
