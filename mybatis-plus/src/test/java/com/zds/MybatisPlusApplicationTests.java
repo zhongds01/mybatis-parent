@@ -5,10 +5,12 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.zds.entity.Customer;
 import com.zds.mapper.CustomerMapper;
+import com.zds.service.ICustomerService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -20,6 +22,10 @@ class MybatisPlusApplicationTests {
     @Autowired
     @Qualifier(value = "customerMapper")
     private CustomerMapper customerMapper;
+
+    @Autowired
+    @Qualifier("customerServiceImpl")
+    private ICustomerService customerService;
 
     @Test
     void testInsert() {
@@ -50,7 +56,7 @@ class MybatisPlusApplicationTests {
         customer.setId(1432971951265148930L);
         System.out.println("update rows is " + customerMapper.updateById(customer));
         // updateWrapper不会自动更新update_time字段
-        System.out.println("delete rows is " + customerMapper.update(null, Wrappers.<Customer>lambdaUpdate().eq(Customer::getId, 1432971951265148930L).set(Customer::getCustomerName, "zhouliang")));
+        System.out.println("update rows is " + customerMapper.update(null, Wrappers.<Customer>lambdaUpdate().eq(Customer::getId, 1432971951265148930L).set(Customer::getCustomerName, "zhouliang")));
     }
 
     @Test
@@ -87,7 +93,7 @@ class MybatisPlusApplicationTests {
         customerMapper.selectPage(page, Wrappers.<Customer>lambdaQuery().eq(Customer::getCustomerSex, "男").like(Customer::getCustomerName, "dong"));
         page.getRecords().forEach(System.out::println);
         // 方式10、使用selectMapsPage方法分页查询，结果集使用map形式保存。
-        Page<Map<String,Object>> pageMap = new Page<>(1,5);
+        Page<Map<String, Object>> pageMap = new Page<>(1, 5);
         customerMapper.selectMapsPage(pageMap, Wrappers.<Customer>lambdaQuery().eq(Customer::getCustomerSex, "男").like(Customer::getCustomerName, "dong"));
         pageMap.getRecords().forEach(System.out::println);
     }
@@ -154,7 +160,7 @@ class MybatisPlusApplicationTests {
     void testTransaction() {
         Customer customer = new Customer().setCustomerName("zhongdongsheng").setCustomerPassword("123456").setCustomerSex("男").setCustomerTel("13260900000").setCustomerEmail("zhongds01@163.com").setCustomerAddress("Wuxi");
         customerMapper.insert(customer);
-        int i = 1/0;
+        int i = 1 / 0;
     }
 
     @Test
@@ -164,5 +170,101 @@ class MybatisPlusApplicationTests {
         customerPage.getRecords().forEach(System.out::println);
     }
 
+    @Test
+    @Transactional
+    void testInsertService() {
+        // 1、使用save()插入数据
+        Customer customer = new Customer().setCustomerName("tutu").setCustomerPassword("123456").setCustomerSex("男").setCustomerTel("13266000000").setCustomerEmail("tutuxiaotaoqi@163.com");
+        boolean isSuccess = customerService.save(customer);
+        System.out.println("insert isSuccess = " + isSuccess);
 
+        // 2、使用saveBatch()批量插入数据。
+        Customer customer1 = new Customer().setCustomerName("taotao").setCustomerPassword("123456").setCustomerSex("女").setCustomerTel("13266000000").setCustomerEmail("tutuxiaotaoqi@163.com");
+        customer.setId(null);
+        List<Customer> customers = Arrays.asList(customer, customer1);
+        // customers.size()为批量插入的记录数，不传也行，默认值为1000，但是建议传
+        // TIPS:测试工程中发现，批量插入的数据中包含之前插入的customer对象时，会报错，原因在于第一次插入时，会自动生成主键id，第一次插入成功后，customer中已经有了id，因此不会重新生成，所以批量插入时就会报主键冲突。
+        System.out.println("insert isSuccess = " + customerService.saveBatch(customers, customers.size()));
+
+        // 3、使用saveOrUpdate()插入更新数据，如果插入的数据存在，就更新，不存在就插入。
+        // 测试插入之前插入的customer1对象
+        customerService.saveOrUpdate(customer1);
+        // 测试插入之前插入一个新对象，设置id为null
+        customer1.setId(null);
+        customerService.saveOrUpdate(customer1);
+
+        // 判断存在不存在的依据就是@TableId主键修饰的字段是否存在
+        // 4、如果saveOrUpdate()中还传入了UpdateWrapper 条件构造器，默认执行update(customer1,wrapper)操作，update()返回false，否则执行saveOrUpdate(customer1)
+        customerService.saveOrUpdate(customer1, Wrappers.<Customer>lambdaUpdate().set(Customer::getCustomerName, "dszhong").eq(Customer::getId, 1L));
+
+
+        // 5、saveOrUpdateBatch批量插入更新操作
+
+
+    }
+
+    @Test
+    @Transactional
+    void testServiceUpdate() {
+        Customer customer = new Customer().setCustomerName("tutu").setCustomerSex("男").setCustomerTel("13266000000").setCustomerEmail("tutuxiaotaoqi@163.com");
+        Customer customer1 = new Customer().setCustomerName("taotao").setCustomerPassword("123123").setCustomerSex("女").setCustomerTel("13266000000").setCustomerEmail("tutuxiaotaoqi@163.com");
+        customer.setId(1111L);
+        customer1.setId(1433250516598562817L);
+//        System.out.println("saveOrUpdateBatch isSuccess = " + customerService.saveOrUpdateBatch(Arrays.asList(customer, customer1), 333));
+//        boolean result = customerService.update(customer, Wrappers.<Customer>lambdaUpdate().eq(Customer::getId, 1432972277472821249L));
+//        customerService.updateById(customer);
+//        customerService.updateBatchById(Arrays.asList(customer, customer1));
+//        customerService.update(Wrappers.<Customer>lambdaUpdate().set(Customer::getCustomerName, "zhongdongsheng").set(Customer::getCustomerAddress, "Nanjing").eq(Customer::getId, 1433250516598562817L));
+        customerService.update(customer, Wrappers.<Customer>lambdaUpdate().eq(Customer::getId, 1433250516598562817L));
+    }
+
+    @Test
+    @Transactional
+    void testServiceDelete() {
+//        System.out.println("delete rows = " + customerService.removeById(1433252388331868161L));
+//        System.out.println("delete rows = " + customerService.removeByIds(Arrays.asList(1433252388331868161L, 1433252388331868162L)));
+//        HashMap<String, Object> map = new HashMap<>();
+//        map.put("customer_name","zhouliang");
+//        map.put("id",1433250516598562817L);
+//        map.put("customer_sex","女");
+//        System.out.println("delete rows = " + customerService.removeByMap(map));
+        System.out.println("delete rows = " + customerService.remove(Wrappers.<Customer>lambdaQuery().eq(Customer::getCustomerName, "zhouliang").eq(Customer::getId, 1433250516598562817L).eq(Customer::getCustomerSex, "女")));
+    }
+
+    @Test
+    void testServiceSelect() {
+//        List<Customer> list = customerService.list();
+//        List<Customer> customers = customerService.listByIds(Arrays.asList(1432971951265148930L, 1432971971968184322L));
+//        List<Customer> list = customerService.list(Wrappers.<Customer>lambdaQuery().select(Customer::getId, Customer::getCustomerName).eq(Customer::getId, 1432971951265148930L));
+//        List<Map<String, Object>> maps = customerService.listMaps();
+//        List<Map<String, Object>> maps = customerService.listMaps(Wrappers.<Customer>lambdaQuery().in(Customer::getId, Arrays.asList(1432971951265148930L, 1432971971968184322L)));
+//        HashMap<String, Object> map = new HashMap<>();
+//        map.put("customer_name", "zhouliang");
+//        map.put("id", 1433250516598562817L);
+//        map.put("customer_sex", "女");
+//        List<Customer> customers = customerService.listByMap(map);
+//        customerService.listObjs().forEach(System.out::println);
+        customerService.listObjs(Wrappers.<Customer>lambdaQuery().select(Customer::getCustomerName, Customer::getCustomerPassword)).forEach(System.out::println);
+    }
+
+    @Test
+    void testServiceGet() {
+        Customer customer = customerService.getById(1433250516598562817L);
+        Customer one = customerService.getOne(Wrappers.<Customer>lambdaQuery().eq(Customer::getCustomerName, "zhouliang").last("limit 1"));
+        Customer two = customerService.getOne(Wrappers.<Customer>lambdaQuery().eq(Customer::getCustomerName, "zhouliang"), false);
+        Map<String, Object> map = customerService.getMap(Wrappers.<Customer>lambdaQuery().eq(Customer::getCustomerName, "zhouliang"));
+    }
+
+    @Test
+    void testServicePage() {
+        Page<Customer> page = new Page<>(1, 5);
+        customerService.page(page).getRecords().forEach(System.out::println);
+        Page<Map<String,Object>> mapPage = new Page<>(1,5);
+        customerService.pageMaps(mapPage).getRecords().forEach(System.out::println);
+    }
+
+    @Test
+    void testServiceChain() {
+
+    }
 }
