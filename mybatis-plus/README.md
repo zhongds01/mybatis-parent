@@ -1007,3 +1007,37 @@ update().eq("column", value).remove();
 lambdaUpdate().eq(Entity::getId, value).update(entity);
 ```
 
+## 11、乐观锁
+
+- 1、数据库表设计一个version tinyint(1) 字段，实体类中定义version属性。
+
+- 2、配置乐观锁插件
+
+  ```java
+  @Bean
+  public MybatisPlusInterceptor mybatisPlusInterceptor() {
+      MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
+      // 分页插件配置
+      interceptor.addInnerInterceptor(new PaginationInnerInterceptor(DbType.MYSQL));
+      // 乐观锁插件配置
+      interceptor.addInnerInterceptor(new OptimisticLockerInnerInterceptor());
+      return interceptor;
+  }
+  ```
+
+- 3、测试类测试
+
+  > 先查询，再更新。
+
+  ```java
+  @Test
+  void testVersion() {
+      Customer customer = customerService.getById(1433405065368035330L);
+      customer.setCustomerName("zhouliang");
+      System.out.println("before update version :" + customer.getVersion());
+      customerService.updateById(customer);
+      System.out.println("after update version :" + customer.getVersion());
+  }
+  ```
+
+  
