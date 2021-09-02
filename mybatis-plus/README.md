@@ -258,9 +258,7 @@ customerMapper.selectList(new QueryWrapper<Customer>().notLike(true, "id", "11")
 > 在模糊查询值左侧添加%，即以指定值结尾的模糊查询
 
 ```java
-customerMapper.selectList(new QueryWrapper<Customer>().likeLeft(true, "id", "11")).forEach(System.out::println);
-// SELECT id,customer_name,customer_password,customer_sex,customer_tel,customer_email,customer_address,create_time,update_time,is_deleted FROM customer WHERE is_deleted=0 AND (id LIKE ?)
-// Parameters: %11(String)
+customerMapper.selectList(new QueryWrapper<Customer>().likeLeft(true, "id", "11")).forEach(System.out::println);// SELECT id,customer_name,customer_password,customer_sex,customer_tel,customer_email,customer_address,create_time,update_time,is_deleted FROM customer WHERE is_deleted=0 AND (id LIKE ?)// Parameters: %11(String)
 ```
 
 #### 7.1.13、likeRight
@@ -316,17 +314,13 @@ customerMapper.selectList(new QueryWrapper<Customer>().notIn(true, "id", Arrays.
 > in子查询
 
 ```java
-customerMapper.selectList(new QueryWrapper<Customer>().inSql(true, "id", "select id from customer")).forEach(System.out::println);
-customerMapper.selectList(new QueryWrapper<Customer>().inSql(true, "id", "1,2,3,4,5,6")).forEach(System.out::println);
-// SELECT id,customer_name,customer_password,customer_sex,customer_tel,customer_email,customer_address,create_time,update_time,is_deleted FROM customer WHERE is_deleted=0 AND (id IN (select id from customer))
+customerMapper.selectList(new QueryWrapper<Customer>().inSql(true, "id", "select id from customer")).forEach(System.out::println);customerMapper.selectList(new QueryWrapper<Customer>().inSql(true, "id", "1,2,3,4,5,6")).forEach(System.out::println);// SELECT id,customer_name,customer_password,customer_sex,customer_tel,customer_email,customer_address,create_time,update_time,is_deleted FROM customer WHERE is_deleted=0 AND (id IN (select id from customer))
 ```
 
 #### 7.1.19、notInSql
 
 ```java
-customerMapper.selectList(new QueryWrapper<Customer>().notInSql(true, "id","select id from customer")).forEach(System.out::println);
-customerMapper.selectList(new QueryWrapper<Customer>().notInSql(true, "id", "1,2,3,4,5,6")).forEach(System.out::println);
-// SELECT id,customer_name,customer_password,customer_sex,customer_tel,customer_email,customer_address,create_time,update_time,is_deleted FROM customer WHERE is_deleted=0 AND (id NOT IN (select id from customer))
+customerMapper.selectList(new QueryWrapper<Customer>().notInSql(true, "id","select id from customer")).forEach(System.out::println);customerMapper.selectList(new QueryWrapper<Customer>().notInSql(true, "id", "1,2,3,4,5,6")).forEach(System.out::println);// SELECT id,customer_name,customer_password,customer_sex,customer_tel,customer_email,customer_address,create_time,update_time,is_deleted FROM customer WHERE is_deleted=0 AND (id NOT IN (select id from customer))
 ```
 
 #### 7.1.20、exists
@@ -334,15 +328,13 @@ customerMapper.selectList(new QueryWrapper<Customer>().notInSql(true, "id", "1,2
 > 子查询
 
 ```java
-customerMapper.selectList(new QueryWrapper<Customer>().exists(true, "select id from customer where id = 1")).forEach(System.out::println);
-// SELECT id,customer_name,customer_password,customer_sex,customer_tel,customer_email,customer_address,create_time,update_time,is_deleted FROM customer WHERE is_deleted=0 AND (EXISTS (select id from customer where id = 1))
+customerMapper.selectList(new QueryWrapper<Customer>().exists(true, "select id from customer where id = 1")).forEach(System.out::println);// SELECT id,customer_name,customer_password,customer_sex,customer_tel,customer_email,customer_address,create_time,update_time,is_deleted FROM customer WHERE is_deleted=0 AND (EXISTS (select id from customer where id = 1))
 ```
 
 #### 7.1.21、notExists
 
 ```java
-customerMapper.selectList(new QueryWrapper<Customer>().notExists(true, "select id from customer where id = 1")).forEach(System.out::println);
-// SELECT id,customer_name,customer_password,customer_sex,customer_tel,customer_email,customer_address,create_time,update_time,is_deleted FROM customer WHERE is_deleted=0 AND (NOT EXISTS (select id from customer where id = 1))
+customerMapper.selectList(new QueryWrapper<Customer>().notExists(true, "select id from customer where id = 1")).forEach(System.out::println);// SELECT id,customer_name,customer_password,customer_sex,customer_tel,customer_email,customer_address,create_time,update_time,is_deleted FROM customer WHERE is_deleted=0 AND (NOT EXISTS (select id from customer where id = 1))
 ```
 
 #### 7.1.22、orderBy
@@ -404,14 +396,7 @@ customerMapper.selectList(new QueryWrapper<Customer>().select("id","customer_nam
 > func 方法(主要方便在出现if...else下调用不同方法能不断链)
 
 ```java
-customerMapper.selectList(new QueryWrapper<Customer>().eq("id", 3L).func(true, customerQueryWrapper -> {
-    if (true) {
-        customerQueryWrapper.eq("id",1L);
-    } else {
-        customerQueryWrapper.eq("id",2L);
-    }
-})).forEach(System.out::println);
-// SELECT id,customer_name,customer_password,customer_sex,customer_tel,customer_email,customer_address,create_time,update_time,is_deleted FROM customer WHERE is_deleted=0 AND (id = ? AND id = ?)
+customerMapper.selectList(new QueryWrapper<Customer>().eq("id", 3L).func(true, customerQueryWrapper -> {    if (true) {        customerQueryWrapper.eq("id",1L);    } else {        customerQueryWrapper.eq("id",2L);    }})).forEach(System.out::println);// SELECT id,customer_name,customer_password,customer_sex,customer_tel,customer_email,customer_address,create_time,update_time,is_deleted FROM customer WHERE is_deleted=0 AND (id = ? AND id = ?)
 ```
 
 #### 7.1.28、or
@@ -419,10 +404,7 @@ customerMapper.selectList(new QueryWrapper<Customer>().eq("id", 3L).func(true, c
 > 使用or嵌套sql
 
 ```java
-customerMapper.selectList(new QueryWrapper<Customer>().eq("id",1L).or(true, customerQueryWrapper -> {
-    customerQueryWrapper.eq("id",2L);
-})).forEach(System.out::println);
-// SELECT id,customer_name,customer_password,customer_sex,customer_tel,customer_email,customer_address,create_time,update_time,is_deleted FROM customer WHERE is_deleted=0 AND (id = ? OR (id = ?))
+customerMapper.selectList(new QueryWrapper<Customer>().eq("id",1L).or(true, customerQueryWrapper -> {    customerQueryWrapper.eq("id",2L);})).forEach(System.out::println);// SELECT id,customer_name,customer_password,customer_sex,customer_tel,customer_email,customer_address,create_time,update_time,is_deleted FROM customer WHERE is_deleted=0 AND (id = ? OR (id = ?))
 ```
 
 #### 7.1.29、and
@@ -430,10 +412,7 @@ customerMapper.selectList(new QueryWrapper<Customer>().eq("id",1L).or(true, cust
 > 使用and嵌套sql，与func区分下
 
 ```java
-customerMapper.selectList(new QueryWrapper<Customer>().eq("id", 1L).and(true, customerQueryWrapper -> {
-    customerQueryWrapper.eq("id", 2L);
-})).forEach(System.out::println);
-// SELECT id,customer_name,customer_password,customer_sex,customer_tel,customer_email,customer_address,create_time,update_time,is_deleted FROM customer WHERE is_deleted=0 AND (id = ? AND (id = ?))
+customerMapper.selectList(new QueryWrapper<Customer>().eq("id", 1L).and(true, customerQueryWrapper -> {    customerQueryWrapper.eq("id", 2L);})).forEach(System.out::println);// SELECT id,customer_name,customer_password,customer_sex,customer_tel,customer_email,customer_address,create_time,update_time,is_deleted FROM customer WHERE is_deleted=0 AND (id = ? AND (id = ?))
 ```
 
 #### 7.1.30、nested
@@ -501,11 +480,7 @@ customerMapper.selectList(new QueryWrapper<Customer>().select("id","customer_nam
 #### 7.3.1、set
 
 ```java
-customerMapper.update(null, new UpdateWrapper<Customer>().set("customer_name", "zhongdongsheng").set("customer_sex", "女").eq("id", 1L));
-// UPDATE customer SET customer_name=?,customer_sex=? WHERE is_deleted=0 AND (id = ?)
-
-customerMapper.update(null, new UpdateWrapper<Customer>().setSql("customer_name = 'zhongdongsheng'").set("customer_sex", "女").eq("id", 1L));
-// UPDATE customer SET customer_name = 'zhongdongsheng',customer_sex=? WHERE is_deleted=0 AND (id = ?)
+customerMapper.update(null, new UpdateWrapper<Customer>().set("customer_name", "zhongdongsheng").set("customer_sex", "女").eq("id", 1L));// UPDATE customer SET customer_name=?,customer_sex=? WHERE is_deleted=0 AND (id = ?)customerMapper.update(null, new UpdateWrapper<Customer>().setSql("customer_name = 'zhongdongsheng'").set("customer_sex", "女").eq("id", 1L));// UPDATE customer SET customer_name = 'zhongdongsheng',customer_sex=? WHERE is_deleted=0 AND (id = ?)
 ```
 
 ## 8、分页插件
@@ -576,13 +551,7 @@ public class CustomIdGenerator implements IdentifierGenerator {
 #### 9.2.2、使用配置类
 
 ```java
-/**
- * 自定义主键生成策略方式2，覆盖掉mybatis-plus中的默认策略
- */   
-@Bean
-public IdentifierGenerator identifierGenerator() {
-    return new CustomIdGenerator();
-}
+/** * 自定义主键生成策略方式2，覆盖掉mybatis-plus中的默认策略 */   @Beanpublic IdentifierGenerator identifierGenerator() {    return new CustomIdGenerator();}
 ```
 
 
@@ -692,3 +661,349 @@ void testSelect() {
 ```
 
 ### 10.2、service层
+
+> 实现方式
+
+#### 10.2.1、save（insert）
+
+- save(T entity)
+
+  > 插入单条记录。
+
+  ```java
+  Customer customer = new Customer().setCustomerName("tutu").setCustomerPassword("123456").setCustomerSex("男").setCustomerTel("13266000000").setCustomerEmail("tutuxiaotaoqi@163.com");
+  boolean isSuccess = customerService.save(customer);
+  ```
+
+- saveBatch(Collection<T> entityList)
+
+  > 批量插入数据。
+
+  ```java
+  Customer customer1 = new Customer().setCustomerName("taotao").setCustomerPassword("123456").setCustomerSex("女").setCustomerTel("13266000000").setCustomerEmail("tutuxiaotaoqi@163.com");
+  // 这里给customer的id设置为null，是为了批量插入时，重新为customer对象生成id，否则会与上一条测试记录报主键id冲突。
+  customer.setId(null);
+  List<Customer> customers = Arrays.asList(customer, customer1);
+  customerService.saveBatch(customers);
+  ```
+
+- saveBatch(Collection<T> entityList, int batchSize)
+
+  > 批量插入数据，插入时指定批量插入的数量。
+
+  ```java
+  Customer customer1 = new Customer().setCustomerName("taotao").setCustomerPassword("123456").setCustomerSex("女").setCustomerTel("13266000000").setCustomerEmail("tutuxiaotaoqi@163.com");
+  // 这里给customer的id设置为null，是为了批量插入时，重新为customer对象生成id，否则会与上一条测试记录报主键id冲突。
+  customer.setId(null);
+  List<Customer> customers = Arrays.asList(customer, customer1);
+  customerService.saveBatch(customers, customers.size());
+  ```
+
+- saveOrUpdate(T entity)
+
+  > 插入更新数据，如果插入的数据存在，就更新，不存在就插入。
+  >
+  > **判断的依据为使用@TableId注解的字段是否为null，如果为null，默认该条数据就不存在。**
+
+  ```java
+  // customer之前操作刚插入，id不为null，因此此处为更新操作
+  customerService.saveOrUpdate(customer);
+  // 如果设置了id为null，调用该方法就会重新生成id，并插入新数据
+  customer.setId(null);
+  customerService.saveOrUpdate(customer);
+  ```
+
+- saveOrUpdate(T entity, Wrapper<T> updateWrapper)
+
+  > 该方法默认先执行**update(entity, updateWrapper)**方法，如果更新失败，执行**saveOrUpdate(entity)**方法
+
+- saveOrUpdateBatch(Collection<T> entityList)
+
+  > 批量插入更新操作，如果插入的数据存在，就更新，不存在就插入。
+
+  ```java
+  Customer customer = new Customer().setCustomerName("tutu").setCustomerSex("男").setCustomerTel("13266000000").setCustomerEmail("tutuxiaotaoqi@163.com");
+  Customer customer1 = new Customer().setCustomerName("taotao").setCustomerPassword("123123").setCustomerSex("女").setCustomerTel("13266000000").setCustomerEmail("tutuxiaotaoqi@163.com");
+  customer.setId(1432972277472821249L);
+  // 不给customer1设置id，那么以下操作就是更新customer，插入customer1
+  System.out.println("saveOrUpdateBatch isSuccess = " + customerService.saveOrUpdateBatch(Arrays.asList(customer, customer1)));
+  ```
+
+- saveOrUpdateBatch(Collection<T> entityList, int batchSize)
+
+  > 批量插入更新操作，指定批量插入更新的数量，如果插入的数据存在，就更新，不存在就插入。
+
+  ```java
+  Customer customer = new Customer().setCustomerName("tutu").setCustomerSex("男").setCustomerTel("13266000000").setCustomerEmail("tutuxiaotaoqi@163.com");
+  Customer customer1 = new Customer().setCustomerName("taotao").setCustomerPassword("123123").setCustomerSex("女").setCustomerTel("13266000000").setCustomerEmail("tutuxiaotaoqi@163.com");
+  customer.setId(1432972277472821249L);
+  // 不给customer1设置id，那么以下操作就是更新customer，插入customer1
+  System.out.println("saveOrUpdateBatch isSuccess = " + customerService.saveOrUpdateBatch(Arrays.asList(customer, customer1), 2));
+  ```
+
+#### 10.2.2、remove（delete）
+
+- removeById(Serializable id)
+
+  > 根据主键id删除单条记录
+
+  ```java
+  System.out.println("delete rows = " + customerService.removeById(1433252388331868161L));
+  ```
+
+- removeByIds(Collection<? extends Serializable> idList)
+
+  > 根据主键id删除多条记录，如果删除多条，只要有一条删除成功，返回结果就是true。。。
+
+  ```java
+  System.out.println("delete rows = " + customerService.removeByIds(Arrays.asList(1433252388331868161L, 1433252388331868162L)));
+  ```
+
+- removeByMap(Map<String, Object> columnMap)
+
+  > 根据 columnMap 条件，删除记录
+
+  ```java
+  HashMap<String, Object> map = new HashMap<>();
+  map.put("customer_name","zhouliang");
+  map.put("id",1433250516598562817L);
+  map.put("customer_sex","女");
+  System.out.println("delete rows = " + customerService.removeByMap(map));
+  ```
+
+- remove(Wrapper<T> queryWrapper)
+
+  > 根据 entity 条件，删除记录
+
+  ```java
+  System.out.println("delete rows = " + customerService.remove(Wrappers.<Customer>lambdaQuery().eq(Customer::getCustomerName, "zhouliang").eq(Customer::getId, 1433250516598562817L).eq(Customer::getCustomerSex, "女")));
+  ```
+
+#### 10.2.3、update
+
+- updateById(T entity)
+
+  > 修改单行数据，传入的值为实体类对象，该对象中必须给id赋值，因为sql中id是查询条件，不给id复制传入sql中的值就为null，无法更新数据。
+
+  ```java
+  Customer customer = new Customer().setCustomerName("tutu").setCustomerSex("男").setCustomerTel("13266000000").setCustomerEmail("tutuxiaotaoqi@163.com");
+  customer.setId(1432972277472821249L);
+  customerService.updateById(customer);
+  ```
+
+- updateBatchById(Collection<T> entityList, int batchSize)
+
+  > 批量更新数据，batchSize可以不传
+
+  ```java
+  Customer customer = new Customer().setCustomerName("tutu").setCustomerPassword("123123").setCustomerSex("男").setCustomerTel("13266000000").setCustomerEmail("tutuxiaotaoqi@163.com");
+  Customer customer1 = new Customer().setCustomerName("taotao").setCustomerPassword("123123").setCustomerSex("女").setCustomerTel("13266000000").setCustomerEmail("tutuxiaotaoqi@163.com");
+  customer.setId(1432971951265148930L);
+  customer.setId(1432971951265148930L);
+  customerService.updateBatchById(Arrays.asList(customer,customer1), 2);
+  ```
+
+- update(T entity, Wrapper<T> updateWrapper)
+
+  > 使用条件构造器更新数据
+
+  ```java
+  customerService.update(Wrappers.<Customer>lambdaUpdate().set(Customer::getCustomerName, "zhongdongsheng").set(Customer::getCustomerAddress, "Nanjing").eq(Customer::getId, 1433250516598562817L));
+  ```
+
+- update(Wrapper<T> updateWrapper)
+
+  > 使用是实体类结合条件构造器更新数据，实体类中放更新的字段名称与值，条件构造器设置更新条件
+  >
+  > **实体类中属性值为null的不会更新，@TableId注解的属性也不会更新**
+
+  ```java
+  Customer customer = new Customer().setCustomerName("tutu").setCustomerSex("男").setCustomerTel("13266000000").setCustomerEmail("tutuxiaotaoqi@163.com");
+  // 虽然设置id为1111，但是不会更新
+  customer.setId(1111L);
+  customerService.update(customer,Wrappers.<Customer>lambdaUpdate().eq(Customer::getId, 1433250516598562817L));
+  ```
+
+- saveOrUpdate/saveOrUpdateBatch 见 insert
+
+#### 10.2.4、list（select多条）
+
+- list()
+
+  > 查询所有记录
+
+  ```java
+  List<Customer> list = customerService.list();
+  ```
+
+- listByIds(Collection<? extends Serializable> idList)
+
+  > 根据多id查询多条记录
+
+  ```java
+  List<Customer> customers = customerService.listByIds(Arrays.asList(1432971951265148930L, 1432971971968184322L));
+  ```
+
+- list(Wrapper<T> queryWrapper)
+
+  > 根据条件构造器中的条件查询数据
+
+  ```java
+  List<Customer> list = customerService.list(Wrappers.<Customer>lambdaQuery().select(Customer::getId, Customer::getCustomerName).eq(Customer::getId, 1432971951265148930L));
+  ```
+
+- listMaps()
+
+  > 查询所有记录，查询每一条结果使用map封装
+
+  ```
+  List<Map<String, Object>> maps = customerService.listMaps();
+  ```
+
+- listMaps(Wrapper<T> queryWrapper)
+
+  > 根据条件构造器中的条件查询所有记录，查询每一条结果使用map封装
+
+  ```java
+  List<Map<String, Object>> maps = customerService.listMaps(Wrappers.<Customer>lambdaQuery().in(Customer::getId, Arrays.asList(1432971951265148930L, 1432971971968184322L)));
+  ```
+
+- listByMap(Map<String, Object> columnMap)
+
+  > 查询（根据 columnMap 条件）
+
+  ```java
+  HashMap<String, Object> map = new HashMap<>();
+  map.put("customer_name", "zhouliang");
+  map.put("id", 1433250516598562817L);
+  map.put("customer_sex", "女");
+  List<Customer> customers = customerService.listByMap(map);
+  ```
+
+- listObjs()
+
+  > 查询所有记录，返回第一个字段
+
+  ```java
+  customerService.listObjs().forEach(System.out::println);
+  ```
+
+- listObjs(Function<? super Object, V> mapper)
+
+  > 根据条件构造器中的条件查询所有记录，返回第一个字段
+  >
+  > 以下就是返回所有用户的名称
+
+  ```java
+  customerService.listObjs(Wrappers.<Customer>lambdaQuery().select(Customer::getCustomerName, Customer::getCustomerPassword)).forEach(System.out::println);
+  ```
+
+- listObjs(Function<? super Object, V> mapper)
+
+- listObjs(Wrapper<T> queryWrapper, Function<? super Object, V> mapper)
+
+#### 10.2.5、get（select 单条）
+
+- getById(Serializable id)
+
+  > 根据 ID 查询
+
+  ```java
+  Customer customer = customerService.getById(1433250516598562817L);
+  ```
+
+- getOne(Wrapper<T> queryWrapper)
+
+  > 根据 Wrapper，查询一条记录。结果集，如果是多个会抛出异常，随机取一条加上限制条件 wrapper.last("LIMIT 1")。**感觉不是随机的，而是固定的查询结果集中的第一条**
+
+  ```java
+  Customer one = customerService.getOne(Wrappers.<Customer>lambdaQuery().eq(Customer::getCustomerName, "zhouliang").last("limit 1"));
+  ```
+
+- getOne(Wrapper<T> queryWrapper, boolean throwEx)
+
+  > 根据 Wrapper，查询一条记录。如果出现移除，是否抛出。
+
+  ```java
+  Customer two = customerService.getOne(Wrappers.<Customer>lambdaQuery().eq(Customer::getCustomerName, "zhouliang"), false);
+  ```
+
+- getMap(Wrapper<T> queryWrapper)getObj(Wrapper<T> queryWrapper, Function<? super Object, V> mapper)
+
+  > 根据 Wrapper，查询一条记录。使用map封装，如果出现多条，取第一条
+
+  ```java
+  Map<String, Object> map = customerService.getMap(Wrappers.<Customer>lambdaQuery().eq(Customer::getCustomerName, "zhouliang"));
+  ```
+
+- getObj(Wrapper<T> queryWrapper, Function<? super Object, V> mapper)
+
+  > 根据 Wrapper，查询一条记录。
+
+#### 10.2.6、page（分页查询）
+
+- page(IPage<T> page)
+
+  > 无条件分页查询
+
+  ```java
+  Page<Customer> page = new Page<>(1, 5);
+  customerService.page(page).getRecords().forEach(System.out::println);
+  ```
+
+- page(IPage<T> page, Wrapper<T> queryWrapper)
+
+  > 条件分页查询
+
+- pageMaps(IPage<T> page)
+
+  > 无条件分页查询，结果集使用map封装
+
+  ```java
+  Page<Map<String,Object>> mapPage = new Page<>(1,5);
+  customerService.pageMaps(mapPage).getRecords().forEach(System.out::println);
+  ```
+
+- pageMaps(IPage<T> page, Wrapper<T> queryWrapper)
+
+  > 条件分页查询，结果集使用map封装
+
+#### 10.2.7、count（计数）
+
+- 
+  int count();
+
+  > 查询总记录数
+
+- int count(Wrapper<T> queryWrapper);
+
+  > 根据 Wrapper 条件，查询总记录数
+
+#### 10.2.7、chain（链式查询/修改）
+
+- query
+
+```java
+// 链式查询 普通
+QueryChainWrapper<T> query();
+// 链式查询 lambda 式。注意：不支持 Kotlin
+LambdaQueryChainWrapper<T> lambdaQuery(); 
+
+// 示例：
+query().eq("column", value).one();
+lambdaQuery().eq(Entity::getId, value).list();
+```
+
+- update
+
+```java
+// 链式更改 普通
+UpdateChainWrapper<T> update();
+// 链式更改 lambda 式。注意：不支持 Kotlin 
+LambdaUpdateChainWrapper<T> lambdaUpdate();
+
+// 示例：
+update().eq("column", value).remove();
+lambdaUpdate().eq(Entity::getId, value).update(entity);
+```
+
