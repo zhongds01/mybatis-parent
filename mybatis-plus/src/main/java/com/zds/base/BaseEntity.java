@@ -33,4 +33,8 @@ public class BaseEntity {
     @TableField(fill = FieldFill.INSERT)
     @TableLogic()
     private Integer isDeleted;
+
+    @Version
+    @TableField(fill = FieldFill.INSERT)
+    private Integer version;
 }

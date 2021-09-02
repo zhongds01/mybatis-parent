@@ -22,6 +22,7 @@ public class MybatisPlusHandler implements MetaObjectHandler {
         this.strictInsertFill(metaObject, "createTime", Date::new, Date.class);
         this.strictInsertFill(metaObject, "updateTime", Date::new, Date.class);
         this.strictInsertFill(metaObject, "isDeleted", () -> 0, Integer.class);
+        this.strictInsertFill(metaObject, "version", () -> 1, Integer.class);
     }
 
     @Override

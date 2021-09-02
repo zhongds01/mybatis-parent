@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.ApplicationContext;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
@@ -26,6 +27,9 @@ class MybatisPlusApplicationTests {
     @Autowired
     @Qualifier("customerServiceImpl")
     private ICustomerService customerService;
+
+    @Autowired
+    private ApplicationContext applicationContext;
 
     @Test
     void testInsert() {
@@ -53,10 +57,10 @@ class MybatisPlusApplicationTests {
     void testUpdate() {
         // 方式1、使用updateById方法
         Customer customer = new Customer().setCustomerName("zhongdongsheng").setCustomerAddress("Nanjing").setCustomerSex("男");
-        customer.setId(1432971951265148930L);
+        customer.setId(1433405065368035330L);
         System.out.println("update rows is " + customerMapper.updateById(customer));
         // updateWrapper不会自动更新update_time字段
-        System.out.println("update rows is " + customerMapper.update(null, Wrappers.<Customer>lambdaUpdate().eq(Customer::getId, 1432971951265148930L).set(Customer::getCustomerName, "zhouliang")));
+        // System.out.println("update rows is " + customerMapper.update(null, Wrappers.<Customer>lambdaUpdate().eq(Customer::getId, 1432971951265148930L).set(Customer::getCustomerName, "zhouliang")));
     }
 
     @Test
@@ -209,13 +213,13 @@ class MybatisPlusApplicationTests {
         Customer customer = new Customer().setCustomerName("tutu").setCustomerSex("男").setCustomerTel("13266000000").setCustomerEmail("tutuxiaotaoqi@163.com");
         Customer customer1 = new Customer().setCustomerName("taotao").setCustomerPassword("123123").setCustomerSex("女").setCustomerTel("13266000000").setCustomerEmail("tutuxiaotaoqi@163.com");
         customer.setId(1111L);
-        customer1.setId(1433250516598562817L);
+        customer1.setId(1432971951265148930L);
 //        System.out.println("saveOrUpdateBatch isSuccess = " + customerService.saveOrUpdateBatch(Arrays.asList(customer, customer1), 333));
 //        boolean result = customerService.update(customer, Wrappers.<Customer>lambdaUpdate().eq(Customer::getId, 1432972277472821249L));
-//        customerService.updateById(customer);
+        customerService.updateById(customer1);
 //        customerService.updateBatchById(Arrays.asList(customer, customer1));
 //        customerService.update(Wrappers.<Customer>lambdaUpdate().set(Customer::getCustomerName, "zhongdongsheng").set(Customer::getCustomerAddress, "Nanjing").eq(Customer::getId, 1433250516598562817L));
-        customerService.update(customer, Wrappers.<Customer>lambdaUpdate().eq(Customer::getId, 1433250516598562817L));
+//        customerService.update(customer, Wrappers.<Customer>lambdaUpdate().eq(Customer::getId, 1432971951265148930L));
     }
 
     @Test
@@ -266,5 +270,14 @@ class MybatisPlusApplicationTests {
     @Test
     void testServiceChain() {
 
+    }
+
+    @Test
+    void testVersion() {
+        Customer customer = customerService.getById(1433405065368035330L);
+        customer.setCustomerName("zhouliang");
+        System.out.println("before update version :" + customer.getVersion());
+        customerService.updateById(customer);
+        System.out.println("after update version :" + customer.getVersion());
     }
 }
