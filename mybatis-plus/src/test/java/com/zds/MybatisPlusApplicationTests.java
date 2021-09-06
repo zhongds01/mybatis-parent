@@ -280,4 +280,16 @@ class MybatisPlusApplicationTests {
         customerService.updateById(customer);
         System.out.println("after update version :" + customer.getVersion());
     }
+
+    @Test
+    void testSelfSelectById() {
+        Customer customer = customerService.selectOneCustomById(1433405065368035330L);
+        System.out.println(customer);
+    }
+
+    @Test
+    void testListCustomer() {
+        List<Customer> customer = customerService.listCustomer();
+        customer.forEach(System.out::println);
+    }
 }

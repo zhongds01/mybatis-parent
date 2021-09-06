@@ -15,30 +15,36 @@ public class BaseServiceImpl<M extends BaseMapper<T>, T extends BaseEntity> exte
     public BaseServiceImpl() {
     }
 
+    @Override
     public boolean save(T entity) {
         this.resolveEntity(entity);
         return super.save(entity);
     }
 
+    @Override
     public boolean saveBatch(Collection<T> entityList, int batchSize) {
         entityList.forEach(this::resolveEntity);
         return super.saveBatch(entityList, batchSize);
     }
 
+    @Override
     public boolean updateById(T entity) {
         this.resolveEntity(entity);
         return super.updateById(entity);
     }
 
+    @Override
     public boolean updateBatchById(Collection<T> entityList, int batchSize) {
         entityList.forEach(this::resolveEntity);
         return super.updateBatchById(entityList, batchSize);
     }
 
+    @Override
     public boolean saveOrUpdate(T entity) {
         return entity.getId() == null ? this.save(entity) : this.updateById(entity);
     }
 
+    @Override
     public boolean saveOrUpdateBatch(Collection<T> entityList, int batchSize) {
         entityList.forEach(this::resolveEntity);
         return super.saveOrUpdateBatch(entityList, batchSize);

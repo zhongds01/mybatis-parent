@@ -6,7 +6,10 @@ import com.zds.mapper.CustomerMapper;
 import com.zds.service.ICustomerService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * @author zhouliang
@@ -16,5 +19,17 @@ import org.springframework.stereotype.Service;
 @Service
 @AllArgsConstructor
 public class CustomerServiceImpl extends BaseServiceImpl<CustomerMapper, Customer> implements ICustomerService {
+    @Autowired
+    CustomerMapper customerMapper;
 
+
+    @Override
+    public List<Customer> listCustomer() {
+        return customerMapper.listCustomer();
+    }
+
+    @Override
+    public Customer selectOneCustomById(long id) {
+        return customerMapper.selectOneCustomById(id);
+    }
 }
