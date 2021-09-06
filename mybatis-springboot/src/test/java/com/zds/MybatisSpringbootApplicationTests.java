@@ -1,16 +1,18 @@
 package com.zds;
 
-import com.zds.entity.Custom;
-import com.zds.service.CustomService;
+import com.zds.entity.Customer;
+import com.zds.service.CustomerService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import java.io.IOException;
 
 @SpringBootTest
 class MybatisSpringbootApplicationTests {
 
     @Autowired
-    private CustomService customService;
+    private CustomerService customerService;
 
     @Test
     void contextLoads() {
@@ -18,8 +20,13 @@ class MybatisSpringbootApplicationTests {
     }
 
     @Test
-    void testUpdateCustomById() {
-        customService.updateCustomById(Custom.builder().id(1415300753928499206L).customName("shengdongzhong").customPwd("654321").customSex("男").customTel("13260906627").customEmail("zhongds01@163.com").customAddress("Nanjing").status("E").build());
+    void testUpdateCustomerById() {
+        customerService.updateCustomerById(Customer.builder().id(1415300753928499206L).customerName("shengdongzhong").customerPassword("654321").customerSex("男").customerTel("13260906627").customerEmail("zhongds01@163.com").customerAddress("Nanjing").isDeleted(0).version(0).build());
+    }
+
+    @Test
+    void testInsert() throws IOException {
+        customerService.insertCustomer(Customer.builder().id(1415300753928499216L).customerName("shengdongzhong").customerPassword("654321").customerSex("男").customerTel("13260906627").customerEmail("zhongds01@163.com").customerAddress("Nanjing").isDeleted(0).version(0).build());
     }
 
 }

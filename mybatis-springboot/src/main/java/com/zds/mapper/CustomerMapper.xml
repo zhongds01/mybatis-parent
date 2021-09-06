@@ -16,16 +16,14 @@
 
     <insert id="insertCustomer">
         insert into customer
-        values (#{customer.id}, #{customer.customerName}, #{customer.customerPassword}, #{customer.customerSex},
-                #{customer.customerTel},
-                #{customer.customerEmail}, #{customer.customerAddress}, null, null, #{customer.isDeleted},
-                #{customer.version})
+        values (#{customer.id}, #{customer.customerName}, #{customer.customerPassword}, #{customer.customerSex}, #{customer.customerTel},
+                #{customer.customerEmail}, #{customer.customerAddress}, null, null, #{customer.isDeleted}, #{customer.version})
     </insert>
 
     <update id="updateCustomerById">
         update customer c
-        set c.custom_name     = #{customer.customerName},
-            c.custom_password = #{customer.customerPassword}
+        set c.customer_name = #{customer.customerName},
+            c.customer_password  = #{customer.customerPassword}
         where c.id = #{customer.id}
     </update>
 

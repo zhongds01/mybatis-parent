@@ -159,11 +159,11 @@ public class Custom implements Serializable {
 详细代码见源码
 
 ```java
-import com.zds.entity.Custom;
+import com.zds.entity.Customer;
 import org.apache.ibatis.annotations.Param;
 
 public interface CustomMapper {
-    Custom selectOneCustomById(@Param("id") Long id);
+    Customer selectOneCustomById(@Param("id") Long id);
 }
 ```
 
@@ -171,9 +171,9 @@ public interface CustomMapper {
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.zds.mapper.CustomMapper">
-    <select id="selectOneCustomById" parameterType="long" resultType="custom">
-        select * from custom where custom_id = #{id}
+<mapper namespace="com.zds.mapper.CustomerMapper">
+    <select id="selectOneCustomById" parameterType="long" resultType="customer">
+        select * from customer where custom_id = #{id}
     </select>
 </mapper>
 ```
@@ -181,8 +181,9 @@ public interface CustomMapper {
 ### 6、测试类测试
 
 ```java
-import com.zds.mapper.CustomMapper;
-import com.zds.entity.Custom;
+import com.zds.entity.Customer;
+import com.zds.mapper.CustomerMapper;
+import com.zds.entity.Customer;
 import com.zds.util.SqlSessionUtil;
 import org.apache.ibatis.session.SqlSession;
 import org.junit.Test;
@@ -192,8 +193,8 @@ public class CustomMapperTest {
     public void testSelectOneCustomById() {
         SqlSession sqlSession = SqlSessionUtil.getSqlSession();
         CustomMapper mapper = sqlSession.getMapper(CustomMapper.class);
-        Custom custom = mapper.selectOneCustomById(1415300753928499202L);
-        System.out.println(custom);
+        Customer customer = mapper.selectOneCustomById(1415300753928499202L);
+        System.out.println(customer);
         sqlSession.close();
     }
 }

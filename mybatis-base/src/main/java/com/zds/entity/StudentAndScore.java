@@ -8,6 +8,9 @@ import java.util.List;
 
 /**
  * 学生和成绩类
+ *
+ * @author zhongdongsheng
+ * @datetime 2021/9/6 22:27
  */
 @Data
 @AllArgsConstructor

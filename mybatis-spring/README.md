@@ -178,13 +178,13 @@ mybatis-config.xml
      * 如果不使用事务注解开启事务管理，该方法会成功插入数据
      * 如果使用注解开启事务，则会自动回滚之前的插入操作
      *
-     * @param custom custom
+     * @param customer customer
      * @return int
      */
 @Transactional
 @Override
-public int insertCustom(Custom custom) {
-    int rows = customMapper.insertCustom(custom);
+public int insertCustom(Custom customer) {
+    int rows = customMapper.insertCustom(customer);
     int i = 1 / 0;
     return rows;
 }

@@ -51,23 +51,23 @@ mapper.xml
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.zds.mapper.CustomMapper">
+<mapper namespace="com.zds.mapper.CustomerMapper">
     <!-- 如果使用二级缓存，需要配置以下标签开启 -->
     <cache/>
-    <resultMap id="customMap" type="com.zds.entity.Custom">
+    <resultMap id="customMap" type="com.zds.entity.Customer">
         <id column="custom_id" property="id"/>
     </resultMap>
     <!-- 如果想禁用某条查询的缓存，在查询标签中使用useCache="false"配置 -->
     <select id="selectOneCustomById" parameterType="long" resultMap="customMap" useCache="false">
         select *
-        from custom
+        from customer
         where custom_id = #{id}
     </select>
 
     <insert id="insertCustom">
-        insert into custom
-        values (#{custom.id}, #{custom.customName}, #{custom.customPwd}, #{custom.customSex}, #{custom.customTel},
-        #{custom.customEmail}, #{custom.customAddress}, null, null, #{custom.status})
+        insert into customer
+        values (#{customer.id}, #{customer.customName}, #{customer.customPwd}, #{customer.customSex}, #{customer.customTel},
+        #{customer.customEmail}, #{customer.customAddress}, null, null, #{customer.status})
     </insert>
 </mapper>
 ```

@@ -1,8 +1,8 @@
 package com.zds;
 
-import com.zds.mapper.CustomMapper;
-import com.zds.entity.Custom;
-import com.zds.service.CustomService;
+import com.zds.mapper.CustomerMapper;
+import com.zds.entity.Customer;
+import com.zds.service.CustomerService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,26 +18,27 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration("classpath:application.xml")
 public class AppTest {
     @Autowired
-    private CustomService customService;
+    private CustomerService customerService;
+
     /**
-     * testSelectCustomById
+     * testSelectCustomerById
      */
     @Test
-    public void testSelectCustomById() {
+    public void testSelectCustomerById() {
         ApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:application.xml");
-        CustomMapper bean = applicationContext.getBean(CustomMapper.class);
-        bean.selectOneCustomById(1415300753928499202L).forEach(System.out::println);
+        CustomerMapper bean = applicationContext.getBean(CustomerMapper.class);
+        bean.selectOneCustomerById(1415300753928499202L).forEach(System.out::println);
     }
 
     @Test
     public void testTransactionalInsert() {
         ApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:application.xml");
-        CustomService customServiceImpl = applicationContext.getBean("customServiceImpl", CustomService.class);
-        customServiceImpl.insertCustom(Custom.builder().id(1415300753928499206L).customName("zhongdongsheng").customPwd("123456").customSex("男").customTel("13260906627").customEmail("zhongds01@163.com").customAddress("Nanjing").status("U").build());
+        CustomerService customerServiceImpl = applicationContext.getBean("customServiceImpl", CustomerService.class);
+        customerServiceImpl.insertCustom(Customer.builder().id(1415300753928499206L).customerName("zhongdongsheng").customerPassword("123456").customerSex("男").customerTel("13260906627").customerEmail("zhongds01@163.com").customerAddress("Nanjing").isDeleted(0).version(0).build());
     }
 
     @Test
-    public void testUpdate(){
-        customService.updateCustomById(Custom.builder().id(1415300753928499206L).customName("shengdongzhong").customPwd("654321").customSex("男").customTel("13260906627").customEmail("zhongds01@163.com").customAddress("Nanjing").status("E").build());
+    public void testUpdate() {
+        customerService.updateCustomById(Customer.builder().id(1415300753928499206L).customerName("shengdongzhong").customerPassword("654321").customerSex("男").customerTel("13260906627").customerEmail("zhongds01@163.com").customerAddress("Nanjing").isDeleted(0).version(0).build());
     }
 }

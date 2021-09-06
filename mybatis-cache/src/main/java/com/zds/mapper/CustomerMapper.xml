@@ -21,16 +21,4 @@
                 #{customer.customerEmail}, #{customer.customerAddress}, null, null, #{customer.isDeleted},
                 #{customer.version})
     </insert>
-
-    <update id="updateCustomerById">
-        update customer c
-        set c.custom_name     = #{customer.customerName},
-            c.custom_password = #{customer.customerPassword}
-        where c.id = #{customer.id}
-    </update>
-
-    <select id="selectCustomer" resultType="customer">
-        select *
-        from customer
-    </select>
 </mapper>

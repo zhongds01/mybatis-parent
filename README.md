@@ -64,8 +64,8 @@
   > resultMap：返回值类型，只能为使用resultMap标签指定的id
 
   ```xml
-  <select id="selectOneCustomById" parameterType="long" resultType="custom">
-      select * from custom where custom_id = #{id}
+  <select id="selectOneCustomById" parameterType="long" resultType="customer">
+      select * from customer where custom_id = #{id}
   </select>
   <select id="getScoreWithStudentByStuIdAndCourseId" resultMap="scoreAndStudent">
       select sc.s_id, sc.c_id, sc.score, stu.id, stu.s_name, stu.s_birthday, stu.s_sex
