@@ -21,7 +21,7 @@ class MybatisSpringbootApplicationTests {
 
     @Test
     void testUpdateCustomerById() {
-        customerService.updateCustomerById(Customer.builder().id(1415300753928499206L).customerName("shengdongzhong").customerPassword("654321").customerSex("男").customerTel("13260906627").customerEmail("zhongds01@163.com").customerAddress("Nanjing").isDeleted(0).version(0).build());
+        customerService.updateCustomerById(Customer.builder().id(1415300753928499216L).customerName("zhongdongsheng").customerPassword("123456").customerSex("男").customerTel("13260906627").customerEmail("zhongds01@163.com").customerAddress("Nanjing").isDeleted(0).version(0).build());
     }
 
     @Test

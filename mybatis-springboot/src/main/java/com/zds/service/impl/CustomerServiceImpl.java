@@ -1,11 +1,10 @@
 package com.zds.service.impl;
 
-import com.zds.mapper.CustomerMapper;
 import com.zds.entity.Customer;
+import com.zds.mapper.CustomerMapper;
 import com.zds.service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.List;
@@ -29,7 +28,7 @@ public class CustomerServiceImpl implements CustomerService {
      * @param customer custom
      * @return int
      */
-    @Transactional(rollbackFor = Exception.class)
+    // @Transactional(rollbackFor = Exception.class)
     @Override
     public Integer insertCustomer(Customer customer) throws IOException {
         int rows = customerMapper.insertCustomer(customer);
