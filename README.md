@@ -425,3 +425,133 @@ public class ScoreMapperTest {
 }
 ```
 
+## 5、浅谈MySql中的事务
+
+> 事务四大特性
+
+- 原子性：同一事务中的所有操作，要么全部成功，要么全部失败。
+- 一致性：事务完成后，数据库中的数据总体不会发生改变。
+- 持久性：事务一旦提交后，对数据库的改变就是永久的。
+- 隔离性：事务并发时，不同事务之间所做的操作互不影响。
+
+> 事务隔离级别
+
+- READ_UNCOMMITTED：读未提交内容，一个事务A可以读取别的事务B未提交的数据。一旦事务B发生回滚，则事务A产生**脏读**。
+- READ_COMMITTED：读已提交内容，一个事务A只能读取别的事务B已提交的数据。如果事务A第一次读取后，事务B更新了该数据，事务A第二次读取时就会发现与第一次读取的数据不一致，从而导致**不可重复读**。
+- REPEATABLE_READ：可重复读（MySql默认隔离级别）
+- SERIALIZABLE：串行化
+
+| 隔离级别     | 脏读   | 不可重复读 | 幻读   |
+| ------------ | ------ | ---------- | ------ |
+| **读未提交** | **有** | **有**     | **有** |
+| **读已提交** | 无     | **有**     | **有** |
+| **可重复读** | 无     | 无         | **有** |
+| **串行化**   | 无     | 无         | 无     |
+
+> 事务传播行为
+
+| 事务传播行为类型 | 说明                                                         |
+| :--------------- | :----------------------------------------------------------- |
+| REQUIRED         | 若是有事务在运行，当前的方法就在这个事务内运行；不然，就启动一个新的事务，并在本身的事务内运行； |
+| REQUIRES_NEW     | 当前的方法必须启动新事务，并在它本身的事务内运行；若是有事务正在运行，应该将它挂起。 |
+| MANDATORY        | 当前的方法必须运行在事务内部，若是没有正在运行的事务，将抛出异常。 |
+| SUPPORTS         | 若是有事务在运行，当前的方法就在这个事务内运行；不然它能够不运行在事务中。 |
+| NOT_SUPPORTED    | 当前的方法不该该运行在事务中，若是有运行的事务，将它挂起。   |
+| NEVER            | 当前的方法不该该运行在事务中，若是有运行的事务，就抛出异常。 |
+| NESTED           | 若是有事务在运行，当前的方法就应该在这个事务的嵌套事务内运行。不然，就启动一个新的事务，并在它本身的事务内运行。 |
+
+> 代码演示脏读、不可重复读、幻读场景
+
+- 脏读
+
+```java
+// 事务A进行插入一条数据操作，但最终回抛异常进行回滚
+@Override
+@Transactional(rollbackFor = Exception.class)
+public void saveCustomer(Customer customer) throws Exception {
+    customerMapper.insert(customer);
+    throw new Exception("");
+}
+// 事务B设置事务的隔离级别为READ_UNCOMMITTED，且查询事务A插入的数据。该场景下事务B可以读取到数据。但最终事务A会回滚，数据库中不会存在该记录，这就是脏读。
+@Transactional(isolation = Isolation.READ_UNCOMMITTED, rollbackFor = Exception.class)
+public void useDefaultIsolationAndRequiredPropagation(Long id) {
+    // 1415300753928499216
+    Customer customer = customerMapper.selectOneCustomById(id);
+    System.out.println(customer);
+}
+```
+
+脏读解决：设置事务隔离级别为READ_COMMITTED
+
+```java
+// 事务A进行插入一条数据操作，但最终回抛异常进行回滚
+@Override
+@Transactional(rollbackFor = Exception.class)
+public void saveCustomer(Customer customer) throws Exception {
+    customerMapper.insert(customer);
+    throw new Exception("");
+}
+// 事务B设置事务的隔离级别为READ_COMMITTED，且查询事务A插入的数据。该场景下事务B无法读取到数据。就算事务A会回滚，数据库中不会存在该记录，但别的事务也不会受到影响。
+@Transactional(isolation = Isolation.READ_COMMITTED, rollbackFor = Exception.class)
+public void useDefaultIsolationAndRequiredPropagation(Long id) {
+    // 1415300753928499216
+    Customer customer = customerMapper.selectOneCustomById(id);
+    System.out.println(customer);
+}
+```
+
+- 不可重复读（强调update操作）
+
+操作前提：关闭mybatis的一级缓存
+
+```properties
+mybatis-plus.configuration.local-cache-scope=statement
+```
+
+```java
+// 事务A进行更新数据操作，更新完成后正常提交事务
+@Transactional(rollbackFor = Exception.class)
+public void updateCustomer() {
+    Customer customer = new Customer();
+    customer.setId(1415300753928499216L);
+    customerMapper.updateById(customer);
+}
+// 事务B设置事务的隔离级别为READ_COMMITTED，先执行一次查询操作，随后等待事务A将数据进行更新后，再次进行相同的查询操作，最终发现两次查询结果不一致，导致不可重复读。
+@Transactional(isolation = Isolation.READ_UNCOMMITTED, rollbackFor = Exception.class)
+public void useDefaultIsolationAndRequiredPropagation(Long id) throws InterruptedException {
+    // 1415300753928499216L
+    Customer customer = customerMapper.selectOneCustomById(id);
+    // 模拟另一个事务进行更新操作耗时
+    Thread.sleep(5000L);
+    // 更新数据库中的updateTime字段
+    Customer newCustomer = customerMapper.selectOneCustomById(id);
+    System.out.println(newCustomer.getUpdateTime().equals(customer.getUpdateTime()));// false
+}
+```
+
+不可重复读解决：设置事务隔离级别为REPEATABLE_READ
+
+```java
+// 事务A进行更新数据操作，更新完成后正常提交事务
+@Transactional(rollbackFor = Exception.class)
+public void updateCustomer() {
+    Customer customer = new Customer();
+    customer.setId(1415300753928499216L);
+    customerMapper.updateById(customer);
+}
+// 事务B设置事务的隔离级别为READ_COMMITTED，先执行一次查询操作，随后等待事务A将数据进行更新后，再次进行相同的查询操作，最终发现两次查询结果不一致，导致不可重复读。
+@Transactional(isolation = Isolation.REPEATABLE_READ, rollbackFor = Exception.class)
+public void useDefaultIsolationAndRequiredPropagation(Long id) throws InterruptedException {
+    // 1415300753928499216L
+    Customer customer = customerMapper.selectOneCustomById(id);
+    // 模拟另一个事务进行更新操作耗时
+    Thread.sleep(5000L);
+    // 更新数据库中的updateTime字段
+    Customer newCustomer = customerMapper.selectOneCustomById(id);
+    System.out.println(newCustomer.getUpdateTime().equals(customer.getUpdateTime()));// true
+}
+```
+
+- 幻读（暂不研究）
+
+1. 在可重复读隔离级别下，普通的查询是快照读，是不会看到别的事务插入的数据的。因此，幻读在“当前读”下才会出现。
