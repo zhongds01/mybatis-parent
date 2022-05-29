@@ -552,6 +552,25 @@ public void useDefaultIsolationAndRequiredPropagation(Long id) throws Interrupte
 }
 ```
 
-- 幻读（暂不研究）
+- 幻读（强调insert）
 
-1. 在可重复读隔离级别下，普通的查询是快照读，是不会看到别的事务插入的数据的。因此，幻读在“当前读”下才会出现。
+  > 1.  在可重复读隔离级别下，普通的查询是快照读，同一事务中读取到的数据是一样的，无法读取别的事务插入的数据的。因此，幻读在“当前读”下才会出现。
+  > 2. **当前读**操作中索引失效时，会造成全表扫描，导致全表数据被锁住。
+
+  可重复读隔离级别下，保证了一个事务内查询到的数据的一致性，但也正是因为该一致性，导致这个事务中无法读取到别的事务中插入的数据。如果该事务也进行了数据插入操作，会报主键冲突
+
+  ```sql
+  -- 开启事务A
+  BEGIN; -- T1
+  -- 快照读
+  SELECT * FROM customer WHERE customer.customer_name = 'zhongdongsheng'; -- T2
+  SELECT * FROM customer WHERE customer.customer_name = 'zhongdongsheng'; -- T4
+  -- T2,T4查询结果一致（可重复读），T5执行（当前读）会报主键冲突
+  INSERT INTO customer(id, customer_name) VALUE(1415300753928499217, 'zhongdongsheng'); -- T5
+  -- 事务A提交
+  COMMIT; -- T6
+  
+  -- 事务B，直接插入数据并提交（默认就是自动提交事务）
+  INSERT INTO customer(id, customer_name) VALUE(1415300753928499217, 'zhongdongsheng'); -- T3
+  ```
+
